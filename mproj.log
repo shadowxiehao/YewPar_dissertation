@@ -1,4 +1,4 @@
-This is pdfTeX, Version 3.141592653-2.6-1.40.25 (MiKTeX 23.5) (preloaded format=pdflatex 2023.8.15)  16 AUG 2023 10:41
+This is pdfTeX, Version 3.141592653-2.6-1.40.25 (MiKTeX 23.5) (preloaded format=pdflatex 2023.8.15)  16 AUG 2023 10:59
 entering extended mode
  restricted \write18 enabled.
  file:line:error style messages enabled.
@@ -61,243 +61,11 @@ Package: iftex 2022/02/03 v1.0f TeX engine tests
 \Gm@dimlist=\toks19
  (C:\Program Files\MiKTeX\tex/latex/geometry\geometry.cfg)) (C:\Program Files\MiKTeX\tex/latex/psnfss\newcent.sty
 Package: newcent 2020/03/25 PSNFSS-v9.3 (SPQR) 
-) (C:\Program Files\MiKTeX\tex/latex/stackengine\stackengine.sty
-Package: stackengine 2021/07/22 v4.11\ Stacking text and objects in convenient ways
- (C:\Program Files\MiKTeX\tex/latex/etoolbox\etoolbox.sty
-Package: etoolbox 2020/10/05 v2.5k e-TeX tools for LaTeX (JAW)
-\etb@tempcnta=\count197
-) (C:\Program Files\MiKTeX\tex/latex/listofitems\listofitems.sty (C:\Program Files\MiKTeX\tex/generic/listofitems\listofitems.tex
-\loi_cnt_foreach_nest=\count198
-\loi_nestcnt=\count199
-)
-Package: listofitems 2019/08/21 v1.63 Grab items in lists using user-specified sep char (CT)
-) (C:\Program Files\MiKTeX\tex/latex/tools\calc.sty
-Package: calc 2017/05/25 v4.3 Infix arithmetic (KKT,FJ)
-\calc@Acount=\count266
-\calc@Bcount=\count267
-\calc@Adimen=\dimen154
-\calc@Bdimen=\dimen155
-\calc@Askip=\skip52
-\calc@Bskip=\skip53
-LaTeX Info: Redefining \setlength on input line 80.
-LaTeX Info: Redefining \addtolength on input line 81.
-\calc@Ccount=\count268
-\calc@Cskip=\skip54
-)
-\c@@stackindex=\count269
-\@boxshift=\skip55
-\stack@tmplength=\skip56
-\temp@stkl=\skip57
-\@stackedboxwidth=\skip58
-\@addedbox=\box52
-\@anchorbox=\box53
-\@insetbox=\box54
-\se@backgroundbox=\box55
-\stackedbox=\box56
-\@centerbox=\box57
-\c@ROWcellindex@=\count270
-)
-mproj.cls:105: Misplaced alignment tab character &.
-l.105     Name: & \stackunder{Your Name Here}}{} &
-                                                   Signature: & \rule{4.5cm}...
-I can't figure out why you would want to use a tab mark
-here. If you just want an ampersand, the remedy is
-simple: Just type `I\&' now. But if some right brace
-up above has ended a previous alignment prematurely,
-you're probably due for more error messages, and you
-might try typing `S' now just to see what is salvageable.
-
-
-mproj.cls:105: LaTeX Error: Missing \begin{document}.
-
-See the LaTeX manual or LaTeX Companion for explanation.
-Type  H <return>  for immediate help.
- ...                                              
-                                                  
-l.105 ...ame: & \stackunder{Your Name Here}}{} & S
-                                                  ignature: & \rule{4.5cm}{0...
-You're in trouble here.  Try typing  <return>  to proceed.
-If that doesn't work, type  X <return>  to quit.
-
-mproj.cls:105: Misplaced alignment tab character &.
-l.105 ...ckunder{Your Name Here}}{} & Signature: &
-                                                   \rule{4.5cm}{0.5mm} \\
-I can't figure out why you would want to use a tab mark
-here. If you just want an ampersand, the remedy is
-simple: Just type `I\&' now. But if some right brace
-up above has ended a previous alignment prematurely,
-you're probably due for more error messages, and you
-might try typing `S' now just to see what is salvageable.
-
-mproj.cls:106: Misplaced alignment tab character &.
-<recently read> &
-                 
-l.106           &
-                                                                   &        ...
-I can't figure out why you would want to use a tab mark
-here. If you just want an ampersand, the remedy is
-simple: Just type `I\&' now. But if some right brace
-up above has ended a previous alignment prematurely,
-you're probably due for more error messages, and you
-might try typing `S' now just to see what is salvageable.
-
-mproj.cls:106: Misplaced alignment tab character &.
-l.106 ...                                        &
-                                                              &             ...
-I can't figure out why you would want to use a tab mark
-here. If you just want an ampersand, the remedy is
-simple: Just type `I\&' now. But if some right brace
-up above has ended a previous alignment prematurely,
-you're probably due for more error messages, and you
-might try typing `S' now just to see what is salvageable.
-
-mproj.cls:106: Misplaced alignment tab character &.
-l.106 ...                           &            &
-                                                                       \\
-I can't figure out why you would want to use a tab mark
-here. If you just want an ampersand, the remedy is
-simple: Just type `I\&' now. But if some right brace
-up above has ended a previous alignment prematurely,
-you're probably due for more error messages, and you
-might try typing `S' now just to see what is salvageable.
-
-mproj.cls:107: Misplaced alignment tab character &.
-<recently read> &
-                 
-l.107           &
-                                                                   &        ...
-I can't figure out why you would want to use a tab mark
-here. If you just want an ampersand, the remedy is
-simple: Just type `I\&' now. But if some right brace
-up above has ended a previous alignment prematurely,
-you're probably due for more error messages, and you
-might try typing `S' now just to see what is salvageable.
-
-mproj.cls:107: Misplaced alignment tab character &.
-l.107 ...                                        &
-                                                              &             ...
-I can't figure out why you would want to use a tab mark
-here. If you just want an ampersand, the remedy is
-simple: Just type `I\&' now. But if some right brace
-up above has ended a previous alignment prematurely,
-you're probably due for more error messages, and you
-might try typing `S' now just to see what is salvageable.
-
-mproj.cls:107: Misplaced alignment tab character &.
-l.107 ...                           &            &
-                                                                       \\
-I can't figure out why you would want to use a tab mark
-here. If you just want an ampersand, the remedy is
-simple: Just type `I\&' now. But if some right brace
-up above has ended a previous alignment prematurely,
-you're probably due for more error messages, and you
-might try typing `S' now just to see what is salvageable.
-
-mproj.cls:108: Misplaced \crcr.
-\endtabular ->\crcr 
-                    \egroup \egroup $\egroup 
-l.108   \end{tabular}
-                     
-I can't figure out why you would want to use a tab mark
-or \cr or \span just now. If something like a right brace
-up above has ended a previous alignment prematurely,
-you're probably due for more error messages, and you
-might try typing `S' now just to see what is salvageable.
-
-mproj.cls:108: Too many }'s.
-\endtabular ->\crcr \egroup 
-                            \egroup $\egroup 
-l.108   \end{tabular}
-                     
-You've closed more groups than you opened.
-Such booboos are generally harmless, so keep going.
-
-mproj.cls:108: Too many }'s.
-\endtabular ->\crcr \egroup \egroup 
-                                    $\egroup 
-l.108   \end{tabular}
-                     
-You've closed more groups than you opened.
-Such booboos are generally harmless, so keep going.
-
-LaTeX Font Info:    External font `cmex10' loaded for size
-(Font)              <10.95> on input line 108.
-LaTeX Font Info:    External font `cmex10' loaded for size
-(Font)              <8> on input line 108.
-LaTeX Font Info:    External font `cmex10' loaded for size
-(Font)              <6> on input line 108.
-mproj.cls:108: Extra }, or forgotten $.
-<recently read> \egroup 
-                        
-l.108   \end{tabular}
-                     
-I've deleted a group-closing symbol because it seems to be
-spurious, as in `$x}$'. But perhaps the } is legitimate and
-you forgot something else, as in `\hbox{$x}'. In such cases
-the way to recover is to insert both the forgotten and the
-deleted material, e.g., by typing `I$}'.
-
-
-mproj.cls:108: LaTeX Error: \begin{document} ended by \end{tabular}.
-
-See the LaTeX manual or LaTeX Companion for explanation.
-Type  H <return>  for immediate help.
- ...                                              
-                                                  
-l.108   \end{tabular}
-                     
-Your command was ignored.
-Type  I <command> <return>  to replace it with another command,
-or  <return>  to continue without it.
-
-mproj.cls:108: Missing $ inserted.
-<inserted text> 
-                $
-l.108   \end{tabular}
-                     
-I've inserted something that you may have forgotten.
-(See the <inserted text> above.)
-With luck, this will get me unwedged. But if you
-really didn't forget anything, try typing `2' now; then
-my insertion and my current dilemma will both disappear.
-
-mproj.cls:108: Extra \endgroup.
-<recently read> \endgroup 
-                          
-l.108   \end{tabular}
-                     
-Things are pretty mixed up, but I think the worst is over.
-
-mproj.cls:109: Too many }'s.
-l.109 }
-       
-You've closed more groups than you opened.
-Such booboos are generally harmless, so keep going.
-
-) (C:\Program Files\MiKTeX\tex/latex/graphics\graphicx.sty
+)) (C:\Program Files\MiKTeX\tex/latex/graphics\graphicx.sty
 Package: graphicx 2021/09/16 v1.2d Enhanced LaTeX Graphics (DPC,SPQR)
  (C:\Program Files\MiKTeX\tex/latex/graphics\graphics.sty
-Underfull \hbox (badness 10000) in paragraph at lines 105--29
-
- []
-
-
-Underfull \hbox (badness 10000) in paragraph at lines 105--29
-
- []
-
-
-Underfull \hbox (badness 10000) in paragraph at lines 105--29
-$
- []
-
-
-Underfull \hbox (badness 10000) in paragraph at lines 105--29
-
- []
-
 Package: graphics 2022/03/10 v1.4e Standard LaTeX Graphics (DPC,SPQR)
-(C:\Program Files\MiKTeX\tex/latex/graphics\trig.sty
+ (C:\Program Files\MiKTeX\tex/latex/graphics\trig.sty
 Package: trig 2021/08/11 v1.11 sin cos tan (DPC)
 ) (C:\Program Files\MiKTeX\tex/latex/graphics-cfg\graphics.cfg
 File: graphics.cfg 2016/06/04 v1.11 sample graphics configuration
@@ -306,23 +74,35 @@ Package graphics Info: Driver file: pdftex.def on input line 107.
  (C:\Program Files\MiKTeX\tex/latex/graphics-def\pdftex.def
 File: pdftex.def 2022/09/22 v1.2b Graphics/color driver for pdftex
 ))
-\Gin@req@height=\dimen156
-\Gin@req@width=\dimen157
+\Gin@req@height=\dimen154
+\Gin@req@width=\dimen155
 ) (C:\Program Files\MiKTeX\tex/latex/url\url.sty
 \Urlmuskip=\muskip16
 Package: url 2013/09/16  ver 3.4  Verb mode for urls, etc.
 ) (C:\Program Files\MiKTeX\tex/latex/fancyvrb\fancyvrb.sty
 Package: fancyvrb 2023/01/19 4.5a verbatim text (tvz,hv)
-\FV@CodeLineNo=\count271
+\FV@CodeLineNo=\count197
 \FV@InFile=\read2
-\FV@TabBox=\box58
-\c@FancyVerbLine=\count272
-\FV@StepNumber=\count273
+\FV@TabBox=\box52
+\c@FancyVerbLine=\count198
+\FV@StepNumber=\count199
 \FV@OutFile=\write3
 ) (C:\Program Files\MiKTeX\tex/latex/pdfpages\pdfpages.sty
 Package: pdfpages 2022/12/19 v0.5x Insert pages of external PDF documents (AM)
  (C:\Program Files\MiKTeX\tex/latex/base\ifthen.sty
 Package: ifthen 2022/04/13 v1.1d Standard LaTeX ifthen package (DPC)
+) (C:\Program Files\MiKTeX\tex/latex/tools\calc.sty
+Package: calc 2017/05/25 v4.3 Infix arithmetic (KKT,FJ)
+\calc@Acount=\count266
+\calc@Bcount=\count267
+\calc@Adimen=\dimen156
+\calc@Bdimen=\dimen157
+\calc@Askip=\skip52
+\calc@Bskip=\skip53
+LaTeX Info: Redefining \setlength on input line 80.
+LaTeX Info: Redefining \addtolength on input line 81.
+\calc@Ccount=\count268
+\calc@Cskip=\skip54
 ) (C:\Program Files\MiKTeX\tex/latex/eso-pic\eso-pic.sty
 Package: eso-pic 2023/05/03 v3.0c eso-pic (RN)
 \ESO@tempdima=\dimen158
@@ -350,14 +130,14 @@ Package xcolor Info: Model `wave' substituted by `hsb' on input line 1376.
  (C:\Program Files\MiKTeX\tex/latex/pdfpages\pppdftex.def
 File: pppdftex.def 2022/12/19 v0.5x Pdfpages driver for pdfTeX (AM)
 )
-\pdfpages@includegraphics@status=\count274
-\AM@pagebox=\box59
+\pdfpages@includegraphics@status=\count269
+\AM@pagebox=\box53
 \AM@global@opts=\toks20
-\AM@pagecnt=\count275
+\AM@pagecnt=\count270
 \AM@toc@title=\toks21
 \AM@lof@heading=\toks22
-\c@AM@survey=\count276
-\AM@templatesizebox=\box60
+\c@AM@survey=\count271
+\AM@templatesizebox=\box54
 ) (C:\Program Files\MiKTeX\tex/latex/psnfss\times.sty
 Package: times 2020/03/25 PSNFSS-v9.3 (SPQR) 
 ) (C:\Program Files\MiKTeX\tex/latex/tocbibind\tocbibind.sty
@@ -373,8 +153,8 @@ LaTeX Font Info:    Trying to load font information for OT1+ptm on input line 24
 File: ot1ptm.fd 2001/06/04 font definitions for OT1/ptm.
 ) (C:\Program Files\MiKTeX\tex/latex/l3backend\l3backend-pdftex.def
 File: l3backend-pdftex.def 2023-04-19 L3 backend support: PDF output (pdfTeX)
-\l__color_backend_stack_int=\count277
-\l__pdf_internal_box=\box61
+\l__color_backend_stack_int=\count272
+\l__pdf_internal_box=\box55
 ) (mproj.aux)
 \openout1 = `mproj.aux'.
 
@@ -430,16 +210,16 @@ LaTeX Font Info:    ... okay on input line 24.
 
 (C:\Program Files\MiKTeX\tex/context/base/mkii\supp-pdf.mkii
 [Loading MPS to PDF converter (version 2006.09.02).]
-\scratchcounter=\count278
+\scratchcounter=\count273
 \scratchdimen=\dimen163
-\scratchbox=\box62
-\nofMPsegments=\count279
-\nofMParguments=\count280
+\scratchbox=\box56
+\nofMPsegments=\count274
+\nofMParguments=\count275
 \everyMPshowfont=\toks23
-\MPscratchCnt=\count281
+\MPscratchCnt=\count276
 \MPscratchDim=\dimen164
-\MPnumerator=\count282
-\makeMPintoPDFobject=\count283
+\MPnumerator=\count277
+\makeMPintoPDFobject=\count278
 \everyMPtoPDFconversion=\toks24
 ) (C:\Program Files\MiKTeX\tex/latex/epstopdf-pkg\epstopdf-base.sty
 Package: epstopdf-base 2020-01-24 v2.11 Base part for package epstopdf
@@ -475,10 +255,8 @@ Package: pdflscape-nometadata 2022-10-28 v0.13 Display of landscape pages in PDF
 Package: lscape 2020/05/28 v3.02 Landscape Pages (DPC)
 )
 Package pdflscape Info: Auto-detected driver: pdftex on input line 81.
-)) [1
-
-{C:/Users/vifim/AppData/Local/MiKTeX/fonts/map/pdftex/pdftex.map}{C:/Program Files/MiKTeX/fonts/enc/dvips/base/8r.enc}]
-<images/CompSci_colour.pdf, id=7, 340.27126pt x 49.18375pt>
+))
+<images/CompSci_colour.pdf, id=1, 340.27126pt x 49.18375pt>
 File: images/CompSci_colour.pdf Graphic file (type pdf)
 <use images/CompSci_colour.pdf>
 Package pdftex.def Info: images/CompSci_colour.pdf  used on input line 30.
@@ -489,6 +267,65 @@ LaTeX Font Info:    External font `cmex10' loaded for size
 (Font)              <14.4> on input line 30.
 LaTeX Font Info:    External font `cmex10' loaded for size
 (Font)              <12> on input line 30.
- [1 <./images/CompSci_colour.pdf>] [1]
-Runaway argument?
-d:/OneDrive - Universit
+ [1
+
+{C:/Users/vifim/AppData/Local/MiKTeX/fonts/map/pdftex/pdftex.map}{C:/Program Files/MiKTeX/fonts/enc/dvips/base/8r.enc} <./images/CompSci_colour.pdf>] [1]
+LaTeX Font Info:    External font `cmex10' loaded for size
+(Font)              <10.95> on input line 40.
+LaTeX Font Info:    External font `cmex10' loaded for size
+(Font)              <8> on input line 40.
+LaTeX Font Info:    External font `cmex10' loaded for size
+(Font)              <6> on input line 40.
+ [1] [2] (mproj.toc)
+\tf@toc=\write4
+\openout4 = `mproj.toc'.
+
+ [3
+
+]
+Chapter 1.
+[4
+
+]
+Chapter 2.
+[5
+
+]
+Chapter 3.
+[6
+
+]
+Chapter 4.
+[7
+
+]
+Appendix A.
+[8
+
+]
+Appendix B.
+(mproj.bbl [9
+
+]) [10
+
+] (mproj.aux)
+ ***********
+LaTeX2e <2023-06-01> patch level 1
+L3 programming layer <2023-06-30>
+ ***********
+ ) 
+Here is how much of TeX's memory you used:
+ 4777 strings out of 475551
+ 77338 string characters out of 5772369
+ 1920238 words of memory out of 5000000
+ 25910 multiletter control sequences out of 15000+600000
+ 578624 words of font info for 73 fonts, out of 8000000 for 9000
+ 1141 hyphenation exceptions out of 8191
+ 72i,7n,79p,319b,192s stack positions out of 10000i,1000n,20000p,200000b,200000s
+<C:/Program Files/MiKTeX/fonts/type1/urw/times/utmb8a.pfb><C:/Program Files/MiKTeX/fonts/type1/urw/times/utmr8a.pfb><C:/Program Files/MiKTeX/fonts/type1/urw/times/utmri8a.pfb>
+Output written on mproj.pdf (12 pages, 69474 bytes).
+PDF statistics:
+ 61 PDF objects out of 1000 (max. 8388607)
+ 0 named destinations out of 1000 (max. 500000)
+ 6 words of extra memory for PDF output out of 10000 (max. 10000000)
+
