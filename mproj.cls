@@ -89,6 +89,8 @@
   \global\let\and\relax
 }
 
+\usepackage{graphicx}
+\usepackage{makebox}
 \newcommand{\educationalconsent}{
   \newpage
   \section*{Education Use Consent}
@@ -99,10 +101,10 @@
     this declaration, but doing so would help future students.}
 
   \begin{tabular}{@{}llll}
-          &                     &            &                     \\
-          &                     &            &                     \\
-    Name: & \rule{4.0cm}{0.5mm} & Signature: & \rule{4.5cm}{0.5mm} \\
-          &                     &            &                     \\
-          &                     &            &                     \\
+          &                           &            &                                                                               \\
+          &                           &            &                                                                               \\
+    Name: & \makebox[5cm][l]{Hao Xie} & Signature: & \makebox[5cm][l]{\includegraphics[width=4.0cm]{images/english_signature.jpg}} \\
+          &                           &            &                                                                               \\
+          &                           &            &                                                                               \\
   \end{tabular}
 }
