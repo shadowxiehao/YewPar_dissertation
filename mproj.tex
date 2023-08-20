@@ -22,6 +22,8 @@
 %\usepackage[final]{pdfpages}
 \usepackage{CTEX}
 \usepackage{comment}
+\usepackage{hyperref}
+\usepackage{cleveref}
 
 \begin{document}
 
@@ -176,6 +178,18 @@ YewPar需要一种更加智能的workstealing策略。
 同时,为了保障能以较低成本收集到更有效的数据,本文对三部分都进行了仔细的设计与优化.
 
 \subsection{节点所有worker的负载情况}
+首先,YewPar的System Stack大致如
+\cref{fig:yewpar_system_stack}
+\cite{10.1007/978-3-030-29400-7_14}
+所示.
+
+\begin{figure}[h] % 'h'表示图片尽量在当前位置
+    \centering % 让图片居中显示
+    \includegraphics[width=0.8\textwidth]{images/YewPar_System_Stack.jpg} % 插入图片，设置图片宽度为文本宽度的80%
+    \caption{YewPar System Stack} % 提供图片的注解
+    \label{fig:yewpar_system_stack} % 为图片提供一个标签，以便在文档的其他地方引用
+\end{figure}
+
 
 
 \subsection{各节点剩余任务量收集}
