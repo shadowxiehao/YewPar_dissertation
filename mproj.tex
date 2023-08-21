@@ -24,6 +24,7 @@
 \usepackage{comment}
 \usepackage{hyperref}
 \usepackage{cleveref}
+\crefname{figure}{Figure}{Figures} % 设置 \cref 引用图像的格式
 \usepackage[section]{placeins} % 添加这个以限制浮动体跨越节的边界
 
 
@@ -149,7 +150,8 @@ Workstealing 是并行编程中的一个核心概念。
 与workstealing形成对比的是工作共享策略,
 它是动态多线程调度的另一种方法。
 在工作共享中,新产生的任务会被立即调度到一个处理器上执行。
-相较于此,workstealing减少了处理器间的任务迁移,因为当所有处理器都繁忙时,这种迁移是不会发生的.\cite{10.1145/324133.324234}
+相较于此,workstealing减少了处理器间的任务迁移,
+因为当所有处理器都繁忙时,这种迁移是不会发生的.\cite{10.1145/324133.324234}
 
 尽管如此,传统的随机窃取策略在多节点复杂环境中往往有较大的开销.
 这些开销主要来源于“窃贼”在集群中随机地探测节点以寻找“受害者”.
@@ -188,14 +190,17 @@ YewPar需要一种更加智能的workstealing策略。
 
 \begin{figure}[h] % 'h'表示图片尽量在当前位置
     \centering % 让图片居中显示
-    \includegraphics[width=0.8\textwidth]{images/YewPar_System_Stack.jpg} % 插入图片，设置图片宽度为文本宽度的80%
+    \includegraphics[width=0.9\textwidth]{images/YewPar_System_Stack.jpg} % 插入图片，设置图片宽度为文本宽度的80%
     \caption{YewPar System Stack} % 提供图片的注解
     \label{fig:yewpar_system_stack} % 为图片提供一个标签，以便在文档的其他地方引用
 \end{figure}
 \FloatBarrier
 
-其中真正负责执行任务的是YewPar的worker,所以如果想要获得各节点的负载情况,就需要获取各节点的worker的负载情况.
-我们对worker的工作流程进行了分析,大致如下图\cref{fig:period_of_worker}
+其中Policy负责被worker调用时,通过自己的策略试图获取任务
+(最终会从本地池获取或从其它节点任务池偷取任务),
+真正负责执行任务的是YewPar的worker,
+所以如果想要不依赖系统底层函数获得各节点的负载情况,就需要获取各节点的worker的负载情况.
+本文对worker的工作流程进行了分析,如\cref{fig:period_of_worker}
 
 \begin{figure}[h]
     \centering % 让图片居中显示
@@ -204,6 +209,45 @@ YewPar需要一种更加智能的workstealing策略。
     \label{fig:period_of_worker} % 为图片提供一个标签，以便在文档的其他地方引用
 \end{figure}
 \FloatBarrier
+
+可以看出每个worker从创建到销毁之间,
+它的生命周期都处在一个循环中,其中包含了三个可能的阶段:
+
+1.调用Policy的getWork函数获取任务;
+
+2.如果获取到任务则执行该任务;
+
+3.如果没有获取到任务则休眠一段时间,
+这段时间随着没有获取到任务的次数的增加而增加,当再次获取到任务时则时间重置
+
+这三个阶段中,第一阶段是每次循环都会经历的阶段,
+而第二阶段和第三阶段则是互斥关系,每次循环只会经历其中一个阶段.
+
+如果需要分析worker的真实负载情况,
+就需要以第二阶段为核心进行统计,
+因为第二个阶段是worker真正执行任务的阶段,
+它所消耗的时间是worker执行任务的时间,也就是有效的负载时间,
+而其它阶段所消耗的时间则可以归类为worker的空闲时间,
+因为这段时间并没有执行任何任务,也就是无效的负载时间.
+
+由于原先一个周期未必能经历第二阶段,
+所以为了避免更新无效数据,
+本文对worker的生命周期判定进行了重定义,
+以一个任务的执行完毕为一个新周期的开始,
+以一个任务的开始为一个周期的结束,
+这样便能保证每个周期都能经历第二阶段,也就是执行任务的阶段.
+
+在此理论基础上,本文设计了如\cref{fig:worker_collect_calculate}的一套完整的数据收集方案,
+
+\begin{figure}[h]
+    \centering % 让图片居中显示
+    \includegraphics[width=1.0\textwidth]{images/worker_collect_calculate.pdf} % 插入图片，设置图片宽度为文本宽度的80%
+    \caption{collect worker state to calculate the work load} % 提供图片的注解
+    \label{fig:worker_collect_calculate} % 为图片提供一个标签，以便在文档的其他地方引用
+\end{figure}
+\FloatBarrier
+
+
 
 
 \subsection{各节点剩余任务量收集}
