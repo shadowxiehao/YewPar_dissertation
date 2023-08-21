@@ -24,6 +24,9 @@
 \usepackage{comment}
 \usepackage{hyperref}
 \usepackage{cleveref}
+\usepackage[section]{placeins} % 添加这个以限制浮动体跨越节的边界
+
+
 
 \begin{document}
 
@@ -189,10 +192,22 @@ YewPar需要一种更加智能的workstealing策略。
     \caption{YewPar System Stack} % 提供图片的注解
     \label{fig:yewpar_system_stack} % 为图片提供一个标签，以便在文档的其他地方引用
 \end{figure}
+\FloatBarrier
 
+其中真正负责执行任务的是YewPar的worker,所以如果想要获得各节点的负载情况,就需要获取各节点的worker的负载情况.
+我们对worker的工作流程进行了分析,大致如下图\cref{fig:period_of_worker}
+
+\begin{figure}[h]
+    \centering % 让图片居中显示
+    \includegraphics[width=0.8\textwidth]{images/period_of_worker.pdf} % 插入图片，设置图片宽度为文本宽度的80%
+    \caption{period of the worker} % 提供图片的注解
+    \label{fig:period_of_worker} % 为图片提供一个标签，以便在文档的其他地方引用
+\end{figure}
+\FloatBarrier
 
 
 \subsection{各节点剩余任务量收集}
+
 
 \subsection{当前节点获取各节点任务池数据所需时间收集}
 
