@@ -87,12 +87,14 @@ skeletons);并能在多个并行架构上运行。
 
 
 相比之下,本文提出了Performance-Driven Workstealing Policy,
+并为之设计了新的框架能定期监测与传输多项有价值的数据,
+并计算缓存最优窃取目标节点,
 它能够以低成本搜集多项性能指标,如各节点的任务执行时间、处理器的工作/空闲时间比例和任务池获取的耗时,
 并通过自研的Time-Optimized Workstealing Strategy算法计算出最优窃取目标节点并缓存和定时刷新,
 当有worker空闲时便能直接从缓存获取最近一段时间的最优窃取目标,从而能很好的在多节点去中心化的环境下以较低成本缩短完成全部任务所需的时间.
 
 
-本文剖析了具体的设计与实现细节,
+本文对具体的设计与实现细节进行了剖析,
 其中Performance-Driven Workstealing Policy在搜集性能参数时采用了平台无关与去中心化的设计,
 一方面并不涉及具体的系统参数调用命令,而是从YewPar内部和底层的HPX\cite{10.1145/2676870.2676883}框架进行数据收集,从而能够在不同的硬件平台上正常运行;
 另一方面没有单一的节点负责收集所有节点的性能参数,而是各节点各自收集本地的性能参数,并通过HPX的分布式通信机制分享本地处理后的数据,
@@ -177,6 +179,20 @@ YewPar需要一种更加智能的workstealing策略。
 %%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%
 \chapter{Design and implementation}
 
+本文为了Performance-Driven Workstealing Policy设计了一套新的框架,
+框架包含Scheduler Channel(主要负责监测与统计与传输节点所有workers的负载状态),
+Performance Monitor(主要负责统计各项性能数据与发送各项处理后的本地性能数据,并计算和缓存最优窃取目标节点的id),
+和Performance Policy(在本地任务池无任务时,主要负责从Performance Monitor获取最优窃取目标).
+
+组件之间的关系大致如\cref{fig:overall_architecture}所示.
+\begin{figure}[h] % 'h'表示图片尽量在当前位置
+    \centering % 让图片居中显示
+    \includegraphics[width=0.9\textwidth]{images/overall_architecture.pdf} % 插入图片，设置图片宽度为文本宽度的80%
+    \caption{Performance-Driven Workstealing Policy Architecture} % 提供图片的注解
+    \label{fig:overall_architecture} % 为图片提供一个标签，以便在文档的其他地方引用
+\end{figure}
+\FloatBarrier
+
 \section{性能数据收集与传输}
 数据收集包含三部分:各节点负载情况,各节点剩余任务量,各节点获取任务池任务的耗时.
 这三个参数将会为后续的最优窃取目标计算提供有力的数据支持.
@@ -247,7 +263,10 @@ YewPar需要一种更加智能的workstealing策略。
 \end{figure}
 \FloatBarrier
 
-
+通过在任务开始执行之前和执行完成后的位置插入探针,
+让worker在执行任务前后去Scheduler Channel(一个辅助传输状态的channel)中更新自己的状态,
+并计算自己的负载数据,
+方便后续Performance-Driven Policy获取这些数据进行计算.
 
 
 \subsection{各节点剩余任务量收集}
