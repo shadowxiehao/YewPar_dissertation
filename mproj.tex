@@ -27,6 +27,8 @@
 \crefname{figure}{Figure}{Figures} % 设置 \cref 引用图像的格式
 \usepackage[section]{placeins} % 添加这个以限制浮动体跨越节的边界
 
+\usepackage{listings}
+\usepackage{xcolor}  % 用于定义颜色
 
 
 \begin{document}
@@ -193,8 +195,12 @@ Performance Monitor(主要负责统计各项性能数据与发送各项处理后
 \end{figure}
 \FloatBarrier
 
-其中Performance Monitor主要负责各项性能数据的统计和传输,并计算和缓存最优窃取目标节点的id,
-distributed com
+其中Performance Monitor主要负责各项性能数据的统计和传输,并计算和缓存最优窃取目标节点的id;
+distributed component负责存储可供远程和本地访问的任务池和性能等数据,
+通过hpx框架的action提供访问与改写操作;
+Scheduler Channel提供接口让workers能更新自己当前负载状态并计算自己的负载数据,
+workers负责从Performance Policy获取可执行的任务;
+Performance Policy负责调取本地任务池任务或者从Performance Monitor获取最优窃取目标节点后窃取其任务池任务.
 
 %%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%
 
@@ -268,10 +274,22 @@ distributed com
 \end{figure}
 \FloatBarrier
 
-通过在任务开始执行之前和执行完成后的位置插入探针,
-让worker在执行任务前后去Scheduler Channel(一个辅助传输状态的channel)中更新自己的状态,
+通过在任务开始执行之前和执行完成后的位置插入探针代码,
+让worker在执行任务前和完成任务后都去Scheduler Channel(一个辅助传输状态的channel)中更新自己的状态,
 并计算自己的负载数据,
 方便后续Performance-Driven Policy获取这些数据进行计算.
+
+其中Scheduler Channel的统计数据主要由两组长度为workers数量的数组组成,
+一组存储着特定的Record数据结构,
+由一个计时器timer,一个当前状态threadState,一个当前周期的空闲时间idleTime和一个当前周期的工作时间workTime组成,
+方便workers记录自己的具体各状态持续时间等数据,
+由于设计采用一个record对应一个worker的方式,所以record可以不采用锁机制以提升性能;
+另一组存储着采用特定算法计算得出的worker负载率数据workRate,
+由被unique\_ptr包装的原子double类型组成,由于可能有worker和Moninter同时访问,所以需要采用原子类型以保证数据的正确性.
+
+在"set state to WORKING"阶段,worker主要在channel更新自己这轮周期的空闲时间,并更改状态为WORKING;
+而在"set state to IDLE"阶段,worker主要在channel更新自己这轮周期的工作时间,
+并根据空闲与工作时间与历史workRate数据计算出当前的workRate,并更改状态为IDLE.
 
 
 \subsection{各节点剩余任务量收集}
