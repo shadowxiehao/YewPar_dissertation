@@ -308,11 +308,13 @@ Performance Policy负责调取本地任务池任务或者从Performance Monitor�
     \item $\log\left( 2.72 + \frac{\text{workTime}}{\text{workTime} + \text{idleTime}} \right)$,
           是由于在每个周期中,如果WORKING状态的持续时间相对IDLE状态的持续时间比值越大,
           则说明当前任务量较大或者任务较为复杂,所以需要更多的时间来执行任务.
-          同时为了避免数据过于敏感,所以采用了对数函数来降低数据的敏感度.
+          同时为了避免数据过于敏感,所以采用了对数函数来降低数据的敏感度
+          其中使用$(2.72+...)$是为了保证结果永远为正数.
 
     \item $\log\left( 2.72 + (\text{workTime} + \text{idleTime}) \right)$,
           是因为如果当前周期的总持续时间越长,则说明当前任务较为复杂或者worker的性能较低,
           所以需要更多的时间来执行任务.
+          同时也采用了对数函数来降低数据的敏感度.
 
     \item $(... \times 0.65 +\text{workRate} \times 0.35)$,
           这是采用了一种称为指数平滑的算法,通过给与历史数据影响程度一定的系数,
