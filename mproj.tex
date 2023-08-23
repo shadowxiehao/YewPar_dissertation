@@ -22,14 +22,17 @@
 %\usepackage[final]{pdfpages}
 \usepackage{CTEX}
 \usepackage{comment}
-\usepackage{hyperref}
-\usepackage{cleveref}
-\crefname{figure}{Figure}{Figures} % 设置 \cref 引用图像的格式
+
 \usepackage[section]{placeins} % 添加这个以限制浮动体跨越节的边界
 
 \usepackage{listings}
 \usepackage{xcolor}  % 用于定义颜色
 
+\usepackage{amsmath}
+
+\usepackage{hyperref}
+\usepackage{cleveref}
+\crefname{figure}{Figure}{Figures} % 设置 \cref 引用图像的格式
 
 \begin{document}
 
@@ -285,12 +288,36 @@ Performance Policy负责调取本地任务池任务或者从Performance Monitor�
 方便workers记录自己的具体各状态持续时间等数据,
 由于设计采用一个record对应一个worker的方式,所以record可以不采用锁机制以提升性能;
 另一组存储着采用特定算法计算得出的worker负载率数据workRate,
-由被unique\_ptr包装的原子double类型组成,由于可能有worker和Moninter同时访问,所以需要采用原子类型以保证数据的正确性.
+由被unique\_ptr包装的原子double类型组成,
+由于可能有worker和Moninter同时访问,所以需要采用原子类型以保证在无锁机制下数据的正确性.
 
 在"set state to WORKING"阶段,worker主要在channel更新自己这轮周期的空闲时间,并更改状态为WORKING;
 而在"set state to IDLE"阶段,worker主要在channel更新自己这轮周期的工作时间,
 并根据空闲与工作时间与历史workRate数据计算出当前的workRate,并更改状态为IDLE.
 
+而计算最新的workRate的算法如\cref{eq:workrate}所示:
+
+\begin{align}
+    \text{workRate} & = \left( \log\left( 2.72 + \frac{\text{workTime}}{\text{workTime} + \text{idleTime}} \right) \right. \notag   \\
+                    & \qquad \times \left. \log\left( 2.72 + (\text{workTime} + \text{idleTime}) \right) \times 0.65 \right) \notag \\
+                    & \qquad + \text{workRate} \times 0.35 \label{eq:workrate}
+\end{align}
+
+公式目的是为了计算当前worker是否繁忙和计算速度是否较慢,主要分为三部分:
+
+1.$\log\left( 2.72 + \frac{\text{workTime}}{\text{workTime} + \text{idleTime}} \right)$,
+是由于在每个周期中,如果WORKING状态的持续时间相对IDLE状态的持续时间比值越大,
+则说明当前任务量较大或者任务较为复杂,所以需要更多的时间来执行任务.
+同时为了避免数据过于敏感,所以采用了对数函数来降低数据的敏感度.
+
+2.$\log\left( 2.72 + (\text{workTime} + \text{idleTime}) \right)$,
+是因为如果当前周期的总持续时间越长,则说明当前任务较为复杂或者worker的性能较低,所以需要更多的时间来执行任务.
+
+3.$(... \times 0.65 +\text{workRate} \times 0.35)$,
+这是采用了一种称为指数平滑的算法,通过给与历史数据影响程度一定的系数,
+防止短期的波动给结果带来较大的影响,从而使得数据更加平滑和更具参考价值.
+
+最终,计算出的各个worker的workRate数据会通过提供的本地接口在计算总和并除以worker的数量后递交给Performance Monitor.
 
 \subsection{各节点剩余任务量收集}
 
