@@ -234,7 +234,7 @@ Performance Policy负责调取本地任务池任务或者从Performance Monitor�
 
 \begin{figure}[h]
     \centering % 让图片居中显示
-    \includegraphics[width=0.8\textwidth]{images/period_of_worker.pdf} % 插入图片，设置图片宽度为文本宽度的80%
+    \includegraphics[width=0.7\textwidth]{images/period_of_worker.pdf} % 插入图片，设置图片宽度为文本宽度的80%
     \caption{period of the worker} % 提供图片的注解
     \label{fig:period_of_worker} % 为图片提供一个标签，以便在文档的其他地方引用
 \end{figure}
@@ -308,8 +308,8 @@ Performance Policy负责调取本地任务池任务或者从Performance Monitor�
     \item $\log\left( 2.72 + \frac{\text{workTime}}{\text{workTime} + \text{idleTime}} \right)$,
           是由于在每个周期中,如果WORKING状态的持续时间相对IDLE状态的持续时间比值越大,
           则说明当前任务量较大或者任务较为复杂,所以需要更多的时间来执行任务.
-          同时为了避免数据过于敏感,所以采用了对数函数来降低数据的敏感度
-          其中使用$(2.72+...)$是为了保证结果永远为正数.
+          同时为了避免数据过于敏感,所以采用了对数函数来降低数据的敏感度,
+          使用了$(2.72+...)$是为了保证结果永远为正数.
 
     \item $\log\left( 2.72 + (\text{workTime} + \text{idleTime}) \right)$,
           是因为如果当前周期的总持续时间越长,则说明当前任务较为复杂或者worker的性能较低,
@@ -327,10 +327,15 @@ Performance Policy负责调取本地任务池任务或者从Performance Monitor�
 Performance Monitor会将本地workRate数据提交给local distributed component以供其它节点查询.
 
 
-\subsection{各节点剩余任务量收集}
+\subsection{各节点剩余任务量与获取花费时间收集}
 
-
-\subsection{当前节点获取各节点任务池数据所需时间收集}
+\begin{figure}[h]
+    \centering % 让图片居中显示
+    \includegraphics[width=0.95\textwidth]{images/tasks_detection.pdf} % 插入图片，设置图片宽度为文本宽度的80%
+    \caption{collect tasks count and delay time} % 提供图片的注解
+    \label{fig:tasks_detection} % 为图片提供一个标签，以便在文档的其他地方引用
+\end{figure}
+\FloatBarrier
 
 
 \section{最优窃取目标计算}
