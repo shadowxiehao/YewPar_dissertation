@@ -298,20 +298,20 @@ Performance Policy负责调取本地任务池任务或者从Performance Monitor�
 而计算最新的workRate的算法如\cref{eq:workrate}所示:
 
 \begin{align}
-    \text{workRate} & = \left( \log\left( 2.72 + \frac{\text{workTime}}{\text{workTime} + \text{idleTime}} \right) \right. \notag   \\
-                    & \qquad \times \left. \log\left( 2.72 + (\text{workTime} + \text{idleTime}) \right) \times 0.65 \right) \notag \\
+    \text{workRate} & = \left( \ln\left( 2.72 + \frac{\text{workTime}}{\text{workTime} + \text{idleTime}} \right) \right. \notag   \\
+                    & \qquad \times \left. \ln\left( 2.72 + (\text{workTime} + \text{idleTime}) \right) \times 0.65 \right) \notag \\
                     & \qquad + \text{workRate} \times 0.35 \label{eq:workrate}
 \end{align}
 
 公式目的是为了计算当前worker是否繁忙和计算速度是否较慢,主要分为三部分:
 \begin{enumerate}
-    \item $\log\left( 2.72 + \frac{\text{workTime}}{\text{workTime} + \text{idleTime}} \right)$,
+    \item $\ln\left( 2.72 + \frac{\text{workTime}}{\text{workTime} + \text{idleTime}} \right)$,
           是由于在每个周期中,如果WORKING状态的持续时间相对IDLE状态的持续时间比值越大,
           则说明当前任务量较大或者任务较为复杂,所以需要更多的时间来执行任务.
           同时为了避免数据过于敏感,所以采用了对数函数来降低数据的敏感度,
           使用了$(2.72+...)$是为了保证结果永远为正数.
 
-    \item $\log\left( 2.72 + (\text{workTime} + \text{idleTime}) \right)$,
+    \item $\ln\left( 2.72 + (\text{workTime} + \text{idleTime}) \right)$,
           是因为如果当前周期的总持续时间越长,则说明当前任务较为复杂或者worker的性能较低,
           所以需要更多的时间来执行任务.
           同时也采用了对数函数来降低数据的敏感度.
@@ -329,18 +329,89 @@ Performance Monitor会将本地workRate数据提交给local distributed componen
 
 \subsection{各节点剩余任务量与获取花费时间收集}
 
+性能数据还需要对各节点剩余任务量和获取花费时间进行收集,
+具体实现如\cref{fig:tasks_detection}所示.
+
 \begin{figure}[h]
     \centering % 让图片居中显示
-    \includegraphics[width=0.95\textwidth]{images/tasks_detection.pdf} % 插入图片，设置图片宽度为文本宽度的80%
+    \includegraphics[width=0.98\textwidth]{images/tasks_detection.pdf} % 插入图片，设置图片宽度为文本宽度的80%
     \caption{collect tasks count and delay time} % 提供图片的注解
     \label{fig:tasks_detection} % 为图片提供一个标签，以便在文档的其他地方引用
 \end{figure}
 \FloatBarrier
 
+在hpx分布式组件中包含了任务池与剩余任务数量,
+任务池有三种分布式操作包含添加任务,获取任务与窃取任务,
+所以在调用这三种操作时会进行检测并对剩余任务数进行更新.
 
-\section{最优窃取目标计算}
+而在Performance Monitor中,
+会定时遍历并调用各节点的distributed component的接口获取节点的剩余任务数.
+同时在获取时通过计时器计算获取节点任务数的耗时,并加以处理后进行存储,
+存储会存储在一个长度为节点总数的数组的对应节点编号的位置的一个称为NodeInfo的数据结构中,
+也采用了无锁的原子数据以低成本保证线程安全.
 
-\section{刷新最优窃取目标缓存}
+这里耗时反应了节点线程池的繁忙程度和节点之间的通讯延迟时间,
+因为一方面任务数量是采用原子类型,在有数据修改时都会将其它修改或者读取请求延后,
+那么当任务池繁忙时,往往会导致获取任务数的耗时增加;
+另一方面由于各节点之间的通讯是通过hpx的分布式通讯机制进行的,
+当进行"get task count"分布式操作时,中间的耗时也必然反应了节点间的通讯延迟情况.
+后续通过这两项数据也会对最优窃取目标的计算有重要影响.
+
+由于获取任务数耗时是一项时间数据,可能具有较大的数值与波动,所以需要处理后再存储,
+处理公式为
+\begin{align}
+    \text{averageDelayTime}_i & = \ln\left(2.72 + \text{delayTime} \times \text{worker\_count}\right) \times 0.65 \notag               \\
+                              & + \text{nodeInfoVector}[i]\texttt{->}\text{averageDelayTime} \times 0.35   \label{eq:averageDelayTime}
+\end{align}
+其中$i$为节点编号,$\text{delayTime}$为获取任务数的耗时,$\text{worker\_count}$为节点worker数量,
+公式首先通过将延迟时间乘以本地的worker数量来反应综合节点的通讯耗时,
+再同时参考\cref{eq:workrate}也通过对数函数与指数平滑来降低数据的敏感度,并使数据更加平滑和更具参考价值
+
+\section{最优窃取目标计算与缓存}
+
+在Performance Monitor通过性能收集机制获得了包括
+各节点负载情况,各节点剩余任务量,各节点获取任务池任务的耗时等性能数据后,
+Performance Monitor会通过各节点的数据计算出最优窃取目标节点,
+并将其缓存起来以供后续Performance Policy获取.
+其实现如\cref{fig:refresh_target}所示.
+
+\begin{figure}[h]
+    \centering % 让图片居中显示
+    \includegraphics[width=1\textwidth]{images/refresh_target.pdf} % 插入图片，设置图片宽度为文本宽度的80%
+    \caption{refresh the optimal steal target} % 提供图片的注解
+    \label{fig:refresh_target} % 为图片提供一个标签，以便在文档的其他地方引用
+\end{figure}
+\FloatBarrier
+
+这里整体流程也采用了无锁化的设计,通过的互相独立的节点结构和原子数据以低时间成本保证线程安全.
+
+其中首先通过遍历各节点的NodeInfo数据结构中性能数据,来计算各节点的steal-worthiness score,
+得分越高则说明越值得窃取,
+其计算公式为
+\begin{align}
+    \text{score}_i & = \max\left(\text{nodeInfoVector}[i]\texttt{->}\text{workRateAverage}, 0.0001 \right) \notag \\
+                   & \quad\times \text{nodeInfoVector}[i]\texttt{->}\text{tasksCount} \notag                      \\
+                   & \quad - \text{nodeInfoVector}[i]\texttt{->}\text{averageDelayTime} \label{eq:score}
+\end{align}
+
+公式的核心思想是尽量减少预计耗时最长的节点的任务池任务数的同时一定程度减少浪费在窃取其任务上的时间,
+所以先通过$\max\left(\text{nodeInfoVector}[i]\texttt{->}\text{workRateAverage}, 0.0001 \right)$
+来避免过小的无意义数据对计算的干扰,
+之后通过$\times \text{nodeInfoVector}[i]\texttt{->}\text{tasksCount}$来预估该节点执行完任务的大致剩余时间,
+最后通过$- \text{nodeInfoVector}[i]\texttt{->}\text{averageDelayTime}$
+来减去一定的获取任务预估的损耗时间.
+最终得到的结果越大则一定程度上说明该节点越值得窃取.
+
+在遍历完所有节点后,会得到一个最优的节点目标编号索引,
+会将这个最优的节点目标编号索引数进行缓存,
+当Performance Policy需要获取最优窃取目标的$id\_type$时,
+会通过提供的查询接口,
+通过索引再去节点数组里获取最优窃取目标节点的$id\_type$,
+这样同时也保障了在hpx的$id\_type$类型无原子操作的情况下仍能保持无锁机制.
+
+
+\section{刷新机制}
+
 
 
 %%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%
