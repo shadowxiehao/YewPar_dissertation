@@ -135,3 +135,80 @@
   keywords = {Time series—ARIMA, exponential smoothing, state-space models, identification, stability, invertibility, model selection, Comparative methods—evaluation, Intermittent demand, Inventory control, Prediction intervals, Regression—discount weighted, kernel},
   abstract = {In Gardner [Gardner, E. S., Jr. (1985). Exponential smoothing: The state of the art. Journal of Forecasting 4, 1–28], I reviewed the research in exponential smoothing since the original work by Brown and Holt. This paper brings the state of the art up to date. The most important theoretical advance is the invention of a complete statistical rationale for exponential smoothing based on a new class of state-space models with a single source of error. The most important practical advance is the development of a robust method for smoothing damped multiplicative trends. We also have a new adaptive method for simple smoothing, the first such method to demonstrate credible improved forecast accuracy over fixed-parameter smoothing. Longstanding confusion in the literature about whether and how to renormalize seasonal indices in the Holt–Winters methods has finally been resolved. There has been significant work in forecasting for inventory control, including the development of new predictive distributions for total lead-time demand and several improved versions of Croston's method for forecasting intermittent time series. Regrettably, there has been little progress in the identification and selection of exponential smoothing methods. The research in this area is best described as inconclusive, and it is still difficult to beat the application of a damped trend to every time series.}
 }
+
+@article{fromentin2016exploring,
+  author   = {Jean Fromentin and Florent Hivert},
+  title    = {Exploring the tree of numerical semigroups},
+  journal  = {Math. Comp.},
+  volume   = {85},
+  number   = {301},
+  pages    = {2553--2568},
+  year     = {2016},
+  url      = {https://doi.org/10.1090/mcom/3075},
+  abstract = {In this paper we describe an algorithm visiting all numerical semigroups up to a given genus using a well-suited representation. The interest of this algorithm is that it fits particularly well the architecture of modern computers allowing very large optimizations: we obtain the number of numerical semigroups of genus and we confirm the Wilf conjecture for.}
+}
+
+@inproceedings{olivier2006uts,
+  title     = {UTS: An unbalanced tree search benchmark},
+  author    = {Olivier, Stephen and Huan, Jun and Liu, Jinze and Prins, Jan and Dinan, James and Sadayappan, P and Tseng, Chau-Wen},
+  booktitle = {International Workshop on Languages and Compilers for Parallel Computing},
+  pages     = {235--250},
+  year      = {2006},
+  publisher = {Springer}
+}
+
+@inproceedings{10.1007/3-540-60321-2_29,
+  author    = {de Bruin, A.
+               and Kindervater, G. A. P.
+               and Trienekens, H. W. J. M.},
+  editor    = {Ferreira, Afonso
+               and Rolim, Jos{\'e}},
+  title     = {Asynchronous parallel branch and bound and anomalies},
+  booktitle = {Parallel Algorithms for Irregularly Structured Problems},
+  year      = {1995},
+  publisher = {Springer Berlin Heidelberg},
+  address   = {Berlin, Heidelberg},
+  pages     = {363--377},
+  abstract  = {The parallel execution of branch and bound algorithms can result in seemingly unreasonable speedups or slowdowns. Almost never the speedup is equal to the increase in computing power. For synchronous parallel branch and bound, these effects have been studied extensively. For asynchronous parallelizations, only little is known.},
+  isbn      = {978-3-540-44915-7}
+}
+
+@article{ARCHIBALD201892,
+  title    = {Replicable parallel branch and bound search},
+  journal  = {Journal of Parallel and Distributed Computing},
+  volume   = {113},
+  pages    = {92-114},
+  year     = {2018},
+  issn     = {0743-7315},
+  doi      = {https://doi.org/10.1016/j.jpdc.2017.10.010},
+  url      = {https://www.sciencedirect.com/science/article/pii/S0743731517302861},
+  author   = {Blair Archibald and Patrick Maier and Ciaran McCreesh and Robert Stewart and Phil Trinder},
+  keywords = {Algorithmic skeletons, Branch-and-bound, Parallel algorithms, Combinatorial optimisation, Distributed computing, Repeatability},
+  abstract = {Combinatorial branch and bound searches are a common technique for solving global optimisation and decision problems. Their performance often depends on good search order heuristics, refined over decades of algorithms research. Parallel search necessarily deviates from the sequential search order, sometimes dramatically and unpredictably, e.g. by distributing work at random. This can disrupt effective search order heuristics and lead to unexpected and highly variable parallel performance. The variability makes it hard to reason about the parallel performance of combinatorial searches. This paper presents a generic parallel branch and bound skeleton, implemented in Haskell, with replicable parallel performance. The skeleton aims to preserve the search order heuristic by distributing work in an ordered fashion, closely following the sequential search order. We demonstrate the generality of the approach by applying the skeleton to 40 instances of three combinatorial problems: Maximum Clique, 0/1 Knapsack and Travelling Salesperson. The overheads of our Haskell skeleton are reasonable: giving slowdown factors of between 1.9 and 6.2 compared with a class-leading, dedicated, and highly optimised C++ Maximum Clique solver. We demonstrate scaling up to 200 cores of a Beowulf cluster, achieving speedups of 100x for several Maximum Clique instances. We demonstrate low variance of parallel performance across all instances of the three combinatorial problems and at all scales up to 200 cores, with median Relative Standard Deviation (RSD) below 2%. Parallel solvers that do not follow the sequential search order exhibit far higher variance, with median RSD exceeding 85% for Knapsack.}
+}
+
+@article{mccreesh2013multithreading,
+  author  = {Ciaran McCreesh and Patrick Prosser},
+  title   = {Multi-threading a state-of-the-art maximum clique algorithm},
+  journal = {Algorithms},
+  volume  = {6},
+  number  = {4},
+  year    = {2013},
+  pages   = {618--635}
+}
+
+@phdthesis{archibald2018,
+  author = {Blair Archibald},
+  title  = {Skeletons for Exact Combinatorial Search at Scale},
+  year   = {2018},
+  school = {University of Glasgow},
+  url    = {http://theses.gla.ac.uk/id/eprint/31000}
+}
+
+@article{archibald2019yewpar,
+  author = {Blair Archibald and Patrick Maier and Phil Trinder and Robert Stewart},
+  title  = {YewPar: Skeletons for Exact Combinatorial Search [Data Collection]},
+  year   = {2019},
+  url    = {https://doi.org/10.5525/gla.researchdata.935},
+  note   = {(2019)}
+}

@@ -1,0 +1,120 @@
+
+solo run:
+
+1.
+==========
+mpiexec.openmpi -n 20 --host gpgnode-01,gpgnode-02,gpgnode-03,gpgnode-04,gpgnode-05,gpgnode-06,gpgnode-07,gpgnode-08,gpgnode-09,gpgnode-10,gpgnode-11,gpgnode-12,gpgnode-13,gpgnode-14,gpgnode-15,gpgnode-16,gpgnode-17,gpgnode-18,gpgnode-19,gpgnode-20 /cluster/gpg/hao/YewPar/build/install/bin/maxclique-16 -f /cluster/gpg/maxclique_instaces/brock800_2.clq --skeleton depthbounded -d 2 --hpx:threads 16
+[,]
+mpiexec.openmpi -n 20 --host gpgnode-01,gpgnode-02,gpgnode-03,gpgnode-04,gpgnode-05,gpgnode-06,gpgnode-07,gpgnode-08,gpgnode-09,gpgnode-10,gpgnode-11,gpgnode-12,gpgnode-13,gpgnode-14,gpgnode-15,gpgnode-16,gpgnode-17,gpgnode-18,gpgnode-19,gpgnode-20 /cluster/gpg/YewPar/build/install/bin/maxclique-16 -f /cluster/gpg/maxclique_instaces/brock800_2.clq --skeleton depthbounded -d 2 --hpx:threads 16
+[,]
+
+---
+mpiexec.openmpi -n 15 --host gpgnode-01,gpgnode-02,gpgnode-03,gpgnode-04,gpgnode-05,gpgnode-06,gpgnode-07,gpgnode-08,gpgnode-09,gpgnode-10,gpgnode-11,gpgnode-12,gpgnode-13,gpgnode-14,gpgnode-15 /cluster/gpg/hao/YewPar/build/install/bin/maxclique-16 -f /cluster/gpg/maxclique_instaces/brock800_2.clq --skeleton depthbounded -d 2 --hpx:threads 16
+[,]
+mpiexec.openmpi -n 15 --host gpgnode-01,gpgnode-02,gpgnode-03,gpgnode-04,gpgnode-05,gpgnode-06,gpgnode-07,gpgnode-08,gpgnode-09,gpgnode-10,gpgnode-11,gpgnode-12,gpgnode-13,gpgnode-14,gpgnode-15 /cluster/gpg/YewPar/build/install/bin/maxclique-16 -f /cluster/gpg/maxclique_instaces/brock800_2.clq --skeleton depthbounded -d 2 --hpx:threads 16
+[,]
+---
+
+---
+mpiexec.openmpi -n 10 --host gpgnode-01,gpgnode-02,gpgnode-03,gpgnode-04,gpgnode-05,gpgnode-06,gpgnode-07,gpgnode-08,gpgnode-09,gpgnode-10 /cluster/gpg/hao/YewPar/build/install/bin/maxclique-16 -f /cluster/gpg/maxclique_instaces/brock800_2.clq --skeleton depthbounded -d 2 --hpx:threads 16
+[24463,27543,25995,32465,]
+mpiexec.openmpi -n 10 --host gpgnode-01,gpgnode-02,gpgnode-03,gpgnode-04,gpgnode-05,gpgnode-06,gpgnode-07,gpgnode-08,gpgnode-09,gpgnode-10 /cluster/gpg/YewPar/build/install/bin/maxclique-16 -f /cluster/gpg/maxclique_instaces/brock800_2.clq --skeleton depthbounded -d 2 --hpx:threads 16
+[29963,28186,28006,32229,]
+---
+
+---
+mpiexec.openmpi -n 5 --host gpgnode-01,gpgnode-02,gpgnode-03,gpgnode-04,gpgnode-05 /cluster/gpg/hao/YewPar/build/install/bin/maxclique-16 -f /cluster/gpg/maxclique_instaces/brock800_2.clq --skeleton depthbounded -d 2 --hpx:threads 16
+[51414,64284,58569,66468,65849,55616,62883,64843,63617,60311]
+mpiexec.openmpi -n 5 --host gpgnode-01,gpgnode-02,gpgnode-03,gpgnode-04,gpgnode-05 /cluster/gpg/YewPar/build/install/bin/maxclique-16 -f /cluster/gpg/maxclique_instaces/brock800_2.clq --skeleton depthbounded -d 2 --hpx:threads 16
+[79945,50156,51396,53098,99086,99490,75471,51503,64685,68091]
+---
+
+==========
+
+2.
+==========
+mpiexec.openmpi -n 20 --host gpgnode-01,gpgnode-02,gpgnode-03,gpgnode-04,gpgnode-05,gpgnode-06,gpgnode-07,gpgnode-08,gpgnode-09,gpgnode-10,gpgnode-11,gpgnode-12,gpgnode-13,gpgnode-14,gpgnode-15,gpgnode-16,gpgnode-17,gpgnode-18,gpgnode-19,gpgnode-20 /cluster/gpg/hao/YewPar/build/install/bin/NS-hivert --skeleton budget -b 1000000 -g 47 --hpx:threads 16
+[,]
+mpiexec.openmpi -n 20 --host gpgnode-01,gpgnode-02,gpgnode-03,gpgnode-04,gpgnode-05,gpgnode-06,gpgnode-07,gpgnode-08,gpgnode-09,gpgnode-10,gpgnode-11,gpgnode-12,gpgnode-13,gpgnode-14,gpgnode-15,gpgnode-16,gpgnode-17,gpgnode-18,gpgnode-19,gpgnode-20 /cluster/gpg/YewPar/build/install/bin/NS-hivert --skeleton budget -b 1000000 -g 47 --hpx:threads 16
+[,]
+
+mpiexec.openmpi -n 15 --host gpgnode-01,gpgnode-02,gpgnode-03,gpgnode-04,gpgnode-05,gpgnode-06,gpgnode-07,gpgnode-08,gpgnode-09,gpgnode-10,gpgnode-11,gpgnode-12,gpgnode-13,gpgnode-14,gpgnode-15 /cluster/gpg/hao/YewPar/build/install/bin/NS-hivert --skeleton budget -b 1000000 -g 47 --hpx:threads 16
+[,]
+mpiexec.openmpi -n 15 --host gpgnode-01,gpgnode-02,gpgnode-03,gpgnode-04,gpgnode-05,gpgnode-06,gpgnode-07,gpgnode-08,gpgnode-09,gpgnode-10,gpgnode-11,gpgnode-12,gpgnode-13,gpgnode-14,gpgnode-15 /cluster/gpg/YewPar/build/install/bin/NS-hivert --skeleton budget -b 1000000 -g 47 --hpx:threads 16
+[,]
+
+mpiexec.openmpi -n 10 --host gpgnode-01,gpgnode-02,gpgnode-03,gpgnode-04,gpgnode-05,gpgnode-06,gpgnode-07,gpgnode-08,gpgnode-09,gpgnode-10 /cluster/gpg/hao/YewPar/build/install/bin/NS-hivert --skeleton budget -b 1000000 -g 47 --hpx:threads 16
+[,]
+mpiexec.openmpi -n 10 --host gpgnode-01,gpgnode-02,gpgnode-03,gpgnode-04,gpgnode-05,gpgnode-06,gpgnode-07,gpgnode-08,gpgnode-09,gpgnode-10 /cluster/gpg/YewPar/build/install/bin/NS-hivert --skeleton budget -b 1000000 -g 47 --hpx:threads 16
+[,]
+
+mpiexec.openmpi -n 5 --host gpgnode-01,gpgnode-02,gpgnode-03,gpgnode-04,gpgnode-05 /cluster/gpg/hao/YewPar/build/install/bin/NS-hivert --skeleton budget -b 1000000 -g 47 --hpx:threads 16
+[,]
+mpiexec.openmpi -n 5 --host gpgnode-01,gpgnode-02,gpgnode-03,gpgnode-04,gpgnode-05 /cluster/gpg/YewPar/build/install/bin/NS-hivert --skeleton budget -b 1000000 -g 47 --hpx:threads 16
+[,]
+==========
+
+
+
+
+
+
+
+
+
+==================================================================================================
+
+together run:
+
+1.
+==========
+mpiexec.openmpi -n 20 --host gpgnode-01,gpgnode-02,gpgnode-03,gpgnode-04,gpgnode-05,gpgnode-06,gpgnode-07,gpgnode-08,gpgnode-09,gpgnode-10,gpgnode-11,gpgnode-12,gpgnode-13,gpgnode-14,gpgnode-15,gpgnode-16,gpgnode-17,gpgnode-18,gpgnode-19,gpgnode-20 /cluster/gpg/hao/YewPar/build/install/bin/maxclique-16 -f /cluster/gpg/maxclique_instaces/brock800_2.clq --skeleton depthbounded -d 2 --hpx:threads 16
+[,]
+mpiexec.openmpi -n 20 --host gpgnode-01,gpgnode-02,gpgnode-03,gpgnode-04,gpgnode-05,gpgnode-06,gpgnode-07,gpgnode-08,gpgnode-09,gpgnode-10,gpgnode-11,gpgnode-12,gpgnode-13,gpgnode-14,gpgnode-15,gpgnode-16,gpgnode-17,gpgnode-18,gpgnode-19,gpgnode-20 /cluster/gpg/YewPar/build/install/bin/maxclique-16 -f /cluster/gpg/maxclique_instaces/brock800_2.clq --skeleton depthbounded -d 2 --hpx:threads 16
+[,]
+
+---
+mpiexec.openmpi -n 15 --host gpgnode-01,gpgnode-02,gpgnode-03,gpgnode-04,gpgnode-05,gpgnode-06,gpgnode-07,gpgnode-08,gpgnode-09,gpgnode-10,gpgnode-11,gpgnode-12,gpgnode-13,gpgnode-14,gpgnode-15 /cluster/gpg/hao/YewPar/build/install/bin/maxclique-16 -f /cluster/gpg/maxclique_instaces/brock800_2.clq --skeleton depthbounded -d 2 --hpx:threads 16
+[,]
+mpiexec.openmpi -n 15 --host gpgnode-01,gpgnode-02,gpgnode-03,gpgnode-04,gpgnode-05,gpgnode-06,gpgnode-07,gpgnode-08,gpgnode-09,gpgnode-10,gpgnode-11,gpgnode-12,gpgnode-13,gpgnode-14,gpgnode-15 /cluster/gpg/YewPar/build/install/bin/maxclique-16 -f /cluster/gpg/maxclique_instaces/brock800_2.clq --skeleton depthbounded -d 2 --hpx:threads 16
+[,]
+---
+
+---
+mpiexec.openmpi -n 10 --host gpgnode-01,gpgnode-02,gpgnode-03,gpgnode-04,gpgnode-05,gpgnode-06,gpgnode-07,gpgnode-08,gpgnode-09,gpgnode-10 /cluster/gpg/hao/YewPar/build/install/bin/maxclique-16 -f /cluster/gpg/maxclique_instaces/brock800_2.clq --skeleton depthbounded -d 2 --hpx:threads 16
+[,]
+mpiexec.openmpi -n 10 --host gpgnode-01,gpgnode-02,gpgnode-03,gpgnode-04,gpgnode-05,gpgnode-06,gpgnode-07,gpgnode-08,gpgnode-09,gpgnode-10 /cluster/gpg/YewPar/build/install/bin/maxclique-16 -f /cluster/gpg/maxclique_instaces/brock800_2.clq --skeleton depthbounded -d 2 --hpx:threads 16
+[,]
+---
+
+---
+mpiexec.openmpi -n 5 --host gpgnode-01,gpgnode-02,gpgnode-03,gpgnode-04,gpgnode-05 /cluster/gpg/hao/YewPar/build/install/bin/maxclique-16 -f /cluster/gpg/maxclique_instaces/brock800_2.clq --skeleton depthbounded -d 2 --hpx:threads 16
+[51414,64284,]
+mpiexec.openmpi -n 5 --host gpgnode-01,gpgnode-02,gpgnode-03,gpgnode-04,gpgnode-05 /cluster/gpg/YewPar/build/install/bin/maxclique-16 -f /cluster/gpg/maxclique_instaces/brock800_2.clq --skeleton depthbounded -d 2 --hpx:threads 16
+[79945,50156,]
+---
+
+==========
+
+2.
+==========
+mpiexec.openmpi -n 20 --host gpgnode-01,gpgnode-02,gpgnode-03,gpgnode-04,gpgnode-05,gpgnode-06,gpgnode-07,gpgnode-08,gpgnode-09,gpgnode-10,gpgnode-11,gpgnode-12,gpgnode-13,gpgnode-14,gpgnode-15,gpgnode-16,gpgnode-17,gpgnode-18,gpgnode-19,gpgnode-20 /cluster/gpg/hao/YewPar/build/install/bin/NS-hivert --skeleton budget -b 1000000 -g 47 --hpx:threads 16
+[,]
+mpiexec.openmpi -n 20 --host gpgnode-01,gpgnode-02,gpgnode-03,gpgnode-04,gpgnode-05,gpgnode-06,gpgnode-07,gpgnode-08,gpgnode-09,gpgnode-10,gpgnode-11,gpgnode-12,gpgnode-13,gpgnode-14,gpgnode-15,gpgnode-16,gpgnode-17,gpgnode-18,gpgnode-19,gpgnode-20 /cluster/gpg/YewPar/build/install/bin/NS-hivert --skeleton budget -b 1000000 -g 47 --hpx:threads 16
+[,]
+
+mpiexec.openmpi -n 15 --host gpgnode-01,gpgnode-02,gpgnode-03,gpgnode-04,gpgnode-05,gpgnode-06,gpgnode-07,gpgnode-08,gpgnode-09,gpgnode-10,gpgnode-11,gpgnode-12,gpgnode-13,gpgnode-14,gpgnode-15 /cluster/gpg/hao/YewPar/build/install/bin/NS-hivert --skeleton budget -b 1000000 -g 47 --hpx:threads 16
+[,]
+mpiexec.openmpi -n 15 --host gpgnode-01,gpgnode-02,gpgnode-03,gpgnode-04,gpgnode-05,gpgnode-06,gpgnode-07,gpgnode-08,gpgnode-09,gpgnode-10,gpgnode-11,gpgnode-12,gpgnode-13,gpgnode-14,gpgnode-15 /cluster/gpg/YewPar/build/install/bin/NS-hivert --skeleton budget -b 1000000 -g 47 --hpx:threads 16
+[,]
+
+mpiexec.openmpi -n 10 --host gpgnode-01,gpgnode-02,gpgnode-03,gpgnode-04,gpgnode-05,gpgnode-06,gpgnode-07,gpgnode-08,gpgnode-09,gpgnode-10 /cluster/gpg/hao/YewPar/build/install/bin/NS-hivert --skeleton budget -b 1000000 -g 47 --hpx:threads 16
+[,]
+mpiexec.openmpi -n 10 --host gpgnode-01,gpgnode-02,gpgnode-03,gpgnode-04,gpgnode-05,gpgnode-06,gpgnode-07,gpgnode-08,gpgnode-09,gpgnode-10 /cluster/gpg/YewPar/build/install/bin/NS-hivert --skeleton budget -b 1000000 -g 47 --hpx:threads 16
+[,]
+
+mpiexec.openmpi -n 5 --host gpgnode-01,gpgnode-02,gpgnode-03,gpgnode-04,gpgnode-05 /cluster/gpg/hao/YewPar/build/install/bin/NS-hivert --skeleton budget -b 1000000 -g 47 --hpx:threads 16
+[,]
+mpiexec.openmpi -n 5 --host gpgnode-01,gpgnode-02,gpgnode-03,gpgnode-04,gpgnode-05 /cluster/gpg/YewPar/build/install/bin/NS-hivert --skeleton budget -b 1000000 -g 47 --hpx:threads 16
+[,]
+==========
