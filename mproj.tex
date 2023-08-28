@@ -547,6 +547,14 @@ NS\cite{fromentin2016exploring}的基线实现使用了公开的先进算法.
 这些顺序的C++实现是由领域专家提供的.
 关于应用程序和实例的完整描述在\cite{archibald2018}中.
 
+对maxclique-16应用程序使用了brock800\_2.clq这种较大的数据以延长运行时间减小对比误差,
+和Depth-Bounded skeleton这种较适合maxclique-16应用并能应用Performance-Driven Workstealing Policy的skeleton,
+并设置了参数$d = 2$(spawn-depth: Depth in the tree to spawn at),
+因为在实践中发现,当$d$设置为2时,相对其它参数具有更优的性能和稳定性.
+
+对NS-hivert使用了Budget skeleton这种较适合NS-hivert应用并能应用Performance-Driven Workstealing Policy的skeleton,
+并设置了参数$b = 10^6$(backtrack-budget: Number of backtracks before spawning work)
+和$g = 47$(genus: Depth in the tree to count until)以保障结果准确的情况下增加工作量来延长运行时间以便减小统计误差.
 
 \section{Experimental Setup}
 我们在多达20台机器上对程序运行情况进行了测量,
@@ -577,8 +585,13 @@ NS\cite{fromentin2016exploring}的基线实现使用了公开的先进算法.
 如此重复，直到完成所有测试轮数。
 在这些测试中，运行的程序可以独占所有计算资源。
 
-
-
+\begin{figure}[h]
+    \centering % 让图片居中显示
+    \includegraphics[width=0.98\textwidth]{images/time_comparison_max_solo.pdf} % 插入图片，设置图片宽度为文本宽度的80%
+    \caption{time comparison for maxclique-16} % 提供图片的注解
+    \label{fig:time_comparison_max_solo} % 为图片提供一个标签，以便在文档的其他地方引用
+\end{figure}
+\FloatBarrier
 
 
 
