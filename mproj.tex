@@ -146,12 +146,12 @@ YewPar的主要特点是其灵活性和可扩展性,使其能够应对各种复�
 搜索算法依赖于排序启发式方法尽早找到有用的节点,
 例如决策问题中的目标节点，
 或者分支限界优化问题中的一个强约束节点。为了利用这些启发式方法,
-搜索按从左到右的顺序进行（在树的所有深度上）.
-因此，访问节点的顺序搜索具有关于搜索树的完整信息，例如
-来自它左侧的所有节点的当前最佳解，并且搜索是确定性的。
+搜索按从左到右的顺序进行(在树的所有深度上).
+因此，访问节点的顺序搜索具有关于搜索树的完整信息，
+例如来自它左侧的所有节点的当前最佳解，并且搜索是确定性的。
 并行搜索在没有完整的左侧信息的情况下推测性地搜索子树，
-并可能从从右到左的信息流中受益。但是，这种推测意味着
-并行搜索可能比相同的顺序搜索执行更多的工作。
+并可能从从右到左的信息流中受益。
+但是，这种推测意味着并行搜索可能比相同的顺序搜索执行更多的工作。
 因此，并行搜索因性能异常而臭名昭著\cite{10.1007/3-540-60321-2_29}.
 有害的异常是当w个工作线程上的运行时间超过w-1个工作线程时发生的。
 在这里，额外的工作可能超过额外计算资源的好处，
@@ -587,8 +587,16 @@ NS\cite{fromentin2016exploring}的基线实现使用了公开的先进算法.
 
 \subsection{Isolated Performance Evaluation of Maxclique}
 
-对于Maxclique程序的每组运行时间测试各进行十次取平均值后的结果如\cref{fig:time_comparison_max_solo}所示,
+对于基于Depth-Bounded skeleton的Maxclique程序的每组运行时间测试各进行十次取平均值后的结果如\cref{fig:time_comparison_max_solo}所示,
 其中分为运行时间评估与基于Performance-Driven Workstealing Policy比原来的DepthPool Workstealing Policy的运行速度提升两个部分.
+
+速度提升部分的计算公式为
+\begin{equation}
+    \text{Speedup Percentage} = \left( \frac{T_{\text{DepthPool}} - T_{\text{Performance-Driven}}}{T_{\text{Performance-Driven}}} \right) \times 100\%
+\end{equation}
+其中，\( T_{\text{DepthPool}} \) 是基于原版YewPar的DepthPool Workstealing Policy的应用的运行时间,
+而\( T_{\text{Performance-Driven}} \)是基于Performance-Driven Workstealing Policy的应用的运行时间.
+
 \begin{figure}[h]
     \centering % 让图片居中显示
     \includegraphics[width=0.98\textwidth]{images/time_comparison_max_solo.pdf} % 插入图片，设置图片宽度为文本宽度的80%
@@ -604,7 +612,57 @@ NS\cite{fromentin2016exploring}的基线实现使用了公开的先进算法.
 但是从图中也可以看出,在节点数量从5个到15个的区间中,
 速度的提升从最高的5个节点时的11.41\%降低至最低的15个节点时的0.62\%,
 之后到20节点数量时又有所提升,到了1.11\%.
+而理论上节点数量越多,能够优化窃取目标的空间越大,
+所以速度的提升应该是越来越明显的,
+所以我们对这一现象进行了分析.
+\begin{itemize}
+    \item 对于Performance-Driven Workstealing Policy分析后发现,
+          次要原因包含了由于节点的增加导致了系统总体由于数据收集和计算的开销增加等,
+          但是理论上开销的增加相比对于优化窃取目标带来的提升是微不足道的.
+    \item 从应用实现进行研究和测试的具体数据上分析后,
+          发现应该主要是由于性能异常\ref{sec:performance_anomalies}的原因,
+          基于Depth-Bounded skeleton的Maxclique程序相比其它应用具有更高的性能异常的概率,
+          为了验证这一推测,除了对YewPar代码进行分析外,
+          我们还对基于Depth-Bounded skeleton的Maxclique程序进行了运行时间的波动情况的分析,
+          以节点数量为10时的数据为例,
+          其运行时间的波动情况如\cref{fig:maxclique_16_fluctuations}所示,
+          \begin{figure}[h]
+              \centering
+              \includegraphics[width=0.8\textwidth]{images/maxclique_16_fluctuations.pdf}
+              \caption{Runtime fluctuations for maxclique-16 application based on two different policies using 10 localities.}
+              \label{fig:maxclique_16_fluctuations}
+          \end{figure}
+          在评估\texttt{maxclique-16}应用的运行时间波动性时,
+          我们计算了最大值与最小值之间的差异百分比.
+          这可以通过以下公式得出：
+          \begin{equation}
+              \text{Variability Percentage} = \left( \frac{\text{Max Value} - \text{Min Value}}{\text{Min Value}} \right) \times 100\%
+          \end{equation}
+          对于基于Performance-Driven Workstealing Policy的maxclique-16应用,
+          最大差异百分比为43.98\%。
+          而对于基于DepthPool Workstealing Policy的应用,
+          最大差异百分比为23.61\%。
+          不难看出,基于Depth-Bounded skeleton的Maxclique程序的运行时间已经具有很高的波动性,
+          而基于Performance-Driven Workstealing Policy的Maxclique程序的运行时间波动性相比前者更高,几乎是其波动性的两倍.
+          再结合性能异常\ref{sec:performance_anomalies}的内容,
+          不难发现这里Maxclique程序对于额外的计算资源可能会更多的破坏搜索启发式方法,
+          造成系统总体增加了更多的额外任务量.
 
+          而基于Performance-Driven Workstealing Policy的maxclique-16应用由于对于窃取目标的变化更为频繁,
+          由于YewPar窃取目标时的设计是从任务池右侧进行窃取,
+          频繁的变换要窃取的任务池导致窃取的任务不连续,
+          从而更多的导致在没有完整的左侧信息的情况下推测性地搜索子树,
+          生成了更多的额外任务拖慢了程序的运行速度.
+          而且更多节点时越容易导致窃取目标的变动,所以带来的速度提升会相对降低.
+
+          由于这些数据和性能异常的情况相符,从而验证了我们的推测.
+
+          而虽然窃取目标的变动会导致额外的任务生成,
+          但是我们注意到\cref{fig:time_comparison_max_solo}在15节点到20个节点数量的区间中,
+          运行速度还是相对有了提升,
+          应该是由于优化窃取目标带来的收益相比于额外任务带来的损耗逐渐变大导致的.
+
+\end{itemize}
 
 
 \subsection{Isolated Performance Evaluation of NS-hivert}
