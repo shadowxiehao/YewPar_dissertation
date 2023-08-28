@@ -540,6 +540,8 @@ Performance Policy的本质是获取任务的一个策略,
 为了控制变量,
 评估使用的应用程序maxclique-16和NS-hivert是YewPar的hpx1.8分支自带的应用程序,
 并未对其进行改动,
+但运行时窃取策略分别使用了改动后的Performance-Driven Workstealing Policy
+和原版的hpx1.8分支的DepthPool Policy以进行对比.
 其中MaxClique\cite{mccreesh2013multithreading}、
 NS\cite{fromentin2016exploring}的基线实现使用了公开的先进算法.
 这些顺序的C++实现是由领域专家提供的.
@@ -567,7 +569,14 @@ NS\cite{fromentin2016exploring}的基线实现使用了公开的先进算法.
 为了准确评估基于Performance-Driven Workstealing Policy的YewPar与原版在空闲环境下的性能差异,
 我们在各节点均处于空闲状态时,
 对两种应用进行了独立的测试评估。
+为了减小测试误差，我们选择交替运行改动版和原版的应用，
+即在选定一种应用程序后,
+每次运行完基于改动后的Policy框架的程序后,
+立即运行基于原版的Policy的程序,
+然后再次运行基于改动后的Policy框架的程序,
+如此重复，直到完成所有测试轮数。
 在这些测试中，运行的程序可以独占所有计算资源。
+
 
 
 
