@@ -569,10 +569,10 @@ NS\cite{fromentin2016exploring}的基线实现使用了公开的先进算法.
 这可能导致性能异常\ref{sec:performance_anomalies},
 表现为超线性加速/减速.
 为了控制这些因素,
-我们对多种不同的节点数量下多次运行每个实验,
+我们对多种不同的节点数量下多次运行每个程序(设置为10次),
 报告累计统计数据.
 
-\section{空闲环境下加速效果评估}
+\section{Isolated Performance Evaluation of Different Policies}
 
 为了准确评估基于Performance-Driven Workstealing Policy的YewPar与原版在空闲环境下的性能差异,
 我们在各节点均处于空闲状态时,
@@ -585,19 +585,64 @@ NS\cite{fromentin2016exploring}的基线实现使用了公开的先进算法.
 如此重复，直到完成所有测试轮数。
 在这些测试中，运行的程序可以独占所有计算资源。
 
+\subsection{Isolated Performance Evaluation of Maxclique}
+
+对于Maxclique程序的每组运行时间测试各进行十次取平均值后的结果如\cref{fig:time_comparison_max_solo}所示,
+其中分为运行时间评估与基于Performance-Driven Workstealing Policy比原来的DepthPool Workstealing Policy的运行速度提升两个部分.
 \begin{figure}[h]
     \centering % 让图片居中显示
     \includegraphics[width=0.98\textwidth]{images/time_comparison_max_solo.pdf} % 插入图片，设置图片宽度为文本宽度的80%
-    \caption{time comparison for maxclique-16} % 提供图片的注解
+    \caption{isolated time comparison for Maxclique-16} % 提供图片的注解
     \label{fig:time_comparison_max_solo} % 为图片提供一个标签，以便在文档的其他地方引用
+\end{figure}
+\FloatBarrier
+
+从图中可以看出在单独运行下,对于不同的节点数量,
+基于Performance-Driven Workstealing Policy的YewPar都能比原版的DepthPool Workstealing Policy的YewPar有更好的性能,
+能以更短的时间完成所有任务.
+
+但是从图中也可以看出,在节点数量从5个到15个的区间中,
+速度的提升从最高的5个节点时的11.41\%降低至最低的15个节点时的0.62\%,
+之后到20节点数量时又有所提升,到了1.11\%.
+
+
+
+\subsection{Isolated Performance Evaluation of NS-hivert}
+
+
+\begin{figure}[h]
+    \centering % 让图片居中显示
+    \includegraphics[width=0.98\textwidth]{images/time_comparison_ns_solo.pdf} % 插入图片，设置图片宽度为文本宽度的80%
+    \caption{isolated time comparison for NS-hivert} % 提供图片的注解
+    \label{fig:time_comparison_ns_solo} % 为图片提供一个标签，以便在文档的其他地方引用
 \end{figure}
 \FloatBarrier
 
 
 
+\section{Simultaneous Performance Evaluation under Resource Contention}
+
+\subsection{Simultaneous Performance Evaluation of Maxclique}
+
+\begin{figure}[h]
+    \centering % 让图片居中显示
+    \includegraphics[width=0.98\textwidth]{images/time_comparison_max_simultaneously.pdf} % 插入图片，设置图片宽度为文本宽度的80%
+    \caption{simultaneous time comparison for Maxclique-16} % 提供图片的注解
+    \label{fig:time_comparison_max_simu} % 为图片提供一个标签，以便在文档的其他地方引用
+\end{figure}
+\FloatBarrier
 
 
+\subsection{Simultaneous Performance Evaluation of NS-hivert}
 
+
+\begin{figure}[h]
+    \centering % 让图片居中显示
+    \includegraphics[width=0.98\textwidth]{images/time_comparison_ns_simultaneously.pdf} % 插入图片，设置图片宽度为文本宽度的80%
+    \caption{simultaneous time comparison for NS-hivert} % 提供图片的注解
+    \label{fig:time_comparison_ns_simu} % 为图片提供一个标签，以便在文档的其他地方引用
+\end{figure}
+\FloatBarrier
 
 
 %%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%
