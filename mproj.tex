@@ -40,7 +40,7 @@
 %Towards Faster Parallelism: Performance-Driven Workstealing Scheduling in YewPar
 \title{Towards Faster Combinatorial Search: Performance-Driven Workstealing Policy in YewPar}
 \author{Hao Xie}
-\date{24th August 2023}
+\date{31th August 2023}
 \maketitle
 %%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%
 
@@ -85,6 +85,8 @@
     The core philosophy behind this approach is to strive for near load-balancing by predominantly pilfering tasks from nodes with higher loads, thereby minimizing the completion time of the last finishing worker.
     Moreover, by curtailing unnecessary probing time, it significantly reduces the starvation time of task-less workers.
     Ultimately, this results in a marked reduction in the execution time of YewPar-based applications in parallel scenarios.
+    At the same time, since the collected performance parameters are currently available in the most advantageous Workstealing frameworks and can be obtained simply,
+    Therefore, it has good portability and versatility, and it can be more easily transplanted to other platforms and frameworks.
 
     We have also evaluated the improved YewPar with the enhanced Workstealing strategy.
     The evaluation was conducted on a Beowulf cluster equipped with multi-core machines.
@@ -150,7 +152,7 @@ YewPar旨在允许非专业用户从并行中受益;
 我们的目标是通过改进YewPar的Workstealing策略来提高其性能,
 为此本文提出了新的Performance-Driven Workstealing Policy框架,
 它的主要理念是通过尽量去窃取负载较高的节点的任务来达到接近负载均衡的状态,从而缩短最后完成任务的worker的时间,
-并且通过减少不必要的探测时间来缩短无任务worker的饥饿时间,
+并且通过减少不必要的任务探测和窃取时间来缩短无任务worker的饥饿时间,
 最终缩短基于YewPar的应用在并行情况下的运行完成时间.
 
 它具有多项功能,
@@ -161,6 +163,8 @@ YewPar旨在允许非专业用户从并行中受益;
 并通过自研的Time-Optimized Workstealing Strategy算法计算出最优窃取目标节点并缓存和定时刷新,
 当有worker空闲时便能直接从缓存获取最近一段时间的最优窃取目标,
 从而能很好的在多节点去中心化的设计下以较低成本缩短完成全部任务所需的时间.
+同时由于其收集的性能参数是当前有利用到Workstealing的框架都具有并可以采用较为简单的方式获取,
+所以它具有很好的轻量化,可移植性和通用性特点,可以更轻松地将这套方案移植到其它平台与框架上并不必担心对系统造成的额外负担.
 
 本文对具体的设计与实现细节进行了剖析,
 其中Performance-Driven Workstealing Policy在搜集性能参数时采用了平台无关与去中心化的设计,
@@ -198,9 +202,27 @@ YewPar旨在允许非专业用户从并行中受益;
 利用并行性来加速组合搜索已经成为研究的热点.
 并行组合搜索的目标是将搜索空间分解成多个部分,以便可以在多个处理单元上同时执行,从而加速解决方案的发现。
 
-YewPar是一个专为组合搜索设计的并行框架.
+
+并行树搜索可以分类\cite{gendron1994parallel}如下:
+(1)并行节点处理(Parallel Node Processing)并行化分支/边界,
+例如在GPU上计算Flowshop问题的边界\cite{gmys2016work}。
+(2)空间分割,其中并行工作人员推测性地探索搜索树的子树.
+虽然子树是独立探索的,但诸如改进边界之类的知识通常在工作人员之间共享以提高性能.
+(3)组合方法并行运行竞争搜索,通常使用不同的启发式或边界方法.结合这些方法的混合方法也被使用.
+
+\begin{figure}[h]
+    \centering % 让图片居中显示
+    \includegraphics[width=0.98\textwidth]{images/yewpar_maxclique.pdf} % 插入图片，设置图片宽度为文本宽度的80%
+    \caption{Maximum clique instance in YewPar. Input graph with clique \{a,d,f,д\} to the left and corresponding search tree to the right.
+    Each tree node displays the current clique and a list of candidate vertices (in heuristic order) to extend that clique.\cite{10.1145/3332466.3374537}} % 提供图片的注解
+    \label{fig:yewpar_maxclique} % 为图片提供一个标签，以便在文档的其他地方引用
+\end{figure}
+\FloatBarrier
+
+而YewPar是一个专为组合搜索设计的并行框架.
 它提供了一套强大的工具和策略,允许开发者轻松地并行化他们的搜索算法.
-YewPar的主要特点是其灵活性和可扩展性,使其能够应对各种复杂的搜索场景.
+YewPar的主要特点是其灵活性和可扩展性,
+使其能够应对各种复杂的搜索场景.
 其中,workstealing是YewPar中用于任务调度的核心策略,
 它允许处理器在本地任务队列为空时从其他处理器窃取任务,确保所有处理器都能保持忙碌,从而提高整体性能。
 
@@ -230,9 +252,18 @@ Workstealing 是并行编程中的一个核心概念。
 其主要优点在于分散调度,让每个处理器自主地管理其任务队列,从而显著降低了全局同步所带来的开销.
 众多并行框架和库,如 Cilk、TBB 和 OpenMP,都已经采纳了这种方法。
 
+\begin{figure}[h]
+    \centering % 让图片居中显示
+    \includegraphics[width=0.98\textwidth]{images/workstealing.pdf} % 插入图片，设置图片宽度为文本宽度的80%
+    \caption{Workstealing example} % 提供图片的注解
+    \label{fig:workstealing} % 为图片提供一个标签，以便在文档的其他地方引用
+\end{figure}
+\FloatBarrier
+
+如\cref{fig:workstealing},
 在workstealing策略中,系统内的每个处理器都有自己的待执行任务队列.
 每个任务都由一系列指令组成,这些指令需要按顺序执行。
-但在执行的过程中,一个任务还可能生成新的子任务.
+在执行的过程中,一个任务还可能生成新的子任务.
 这些子任务被初步放入生成它们的任务所在的处理器队列.
 当某处理器的任务队列为空时,它会尝试从其他处理器的队列中“窃取”任务.
 这样,workstealing 实际上将任务调度到了空闲的处理器上,
@@ -249,21 +280,47 @@ Workstealing 是并行编程中的一个核心概念。
 加之集群规模的不均匀分布,这种问题变得更为严重,
 导致系统消息量过大以及“窃贼”由于多次窃取失败和网络延迟而产生的长时间饥饿状态.
 尽管关于workstealing的优化尝试从未停歇,
-例如通过建立固定的通道来匹配任务饥饿和任务丰富的节点\cite{10.1145/2851141.2851175},
-但至今仍未有一种通用的去中心化、低开销、跨平台且高效的策略出现。
-workstealing仍处于针对各种应用环境进行持续优化的阶段。
+例如通过建立固定的"媒人"节点,
+让有多余任务的节点和无任务的节点通知媒人节点自己当前的状态,
+从而能让"媒人"节点匹配任务饥饿和任务丰富的节点,
+从而让无任务节点找到有多余任务的节点进行任务的窃取\cite{10.1145/2851141.2851175},
+但是其"媒人"节点的维护和在出现任务饥饿时向"媒人"节点发送查询请求的等待时间等仍然是不可忽视的开销,
+同时它只是匹配了有额外任务的节点和无任务的节点使其能进行任务窃取,
+但是没有针对节点的各项性能参数情况来进行优化,
+可以会导致频繁的发生窃取浪费了不必要的时间;
+或者专门针对Multicore Event-Driven Systems设计的窃取策略\cite{5541655},
+它特别考虑了事件驱动编程的特点，有效提高在这种环境下的并行度,减少了窃取开销,
+但是其但维护任务随机化和延迟窃取策略带来了不少额外的开销,
+并且对于非事件驱动的应用不能很好地适用.
+
+还未有一种很好的通用化的去中心化、低开销、轻量化、跨平台且高效的策略出现。
+workstealing仍主要处于针对各种应用环境进行针对性优化的阶段。
 
 \section{为什么要在YewPar中设计并使用新的workstealing策略}
 
-虽然YewPar已经采用workstealing作为其核心的调度策略,
-但随机发现一个有任务的节点并一直窃取其任务的方法可能导致不必要的开销和计算资源的空闲,
+YewPar采用workstealing作为其核心的分布式并行化调度策略,
+但其采用的是偏随机窃取的策略\cite{archibald2019yewpar},
+空闲的worker会随机尝试窃取其它节点的任务直到获取到有效任务后锁定该节点窃取,
+直至不再能从该节点再窃取到任务后再重新随机选择节点进行窃取,
+这种方法可能导致不必要的开销和计算资源的空闲,
 尤其是在不均匀的任务分布和各节点具有不均衡的计算资源下.
-考虑到组合搜索的特性,任务之间可能存在巨大的执行时间差异,这使得随机窃取策略可能并不是最优选择。
+考虑到组合搜索的特性,
+各节点的任务数量可能存在较大差异,
+任务之间也可能存在巨大的执行时间差异,
+这使得随机窃取策略会更大概率导致空闲worker有较长的饥饿时间,
+并不是最优选择。
 
-为了更好地利用每个处理器的计算能力并减少不必要的通信开销,
+为了更好地利用各节点的各个核心的计算能力并减少不必要的通信开销,
 YewPar需要一种更加智能的workstealing策略。
 基于各节点性能的新的Performance-Driven Workstealing Policy正是为了解决这一问题而提出的。
-通过低成本评估每个节点的性能如平均任务执行时间等,新策略可以更精确地刷新最优窃取目标,从而提高整体性能。
+通过低成本评估每个节点的性能如平均任务执行时间等,
+新策略采用根据各性能参数设计的窃取算法可以更精确地动态刷新最优窃取目标,
+提高整体性能。
+
+同时由于这套方案是基于各节点性能数据主要是采用基于worker,各节点剩余任务量和各节点通讯延迟的性能数据,
+这些数据可以很轻松的在其它采用Workingstealing策略的框架中获取,
+所以具有很好的可移植性和通用性,
+可以更轻松地将这套方案移植到除了YewPar以外其它平台与框架上.
 
 %%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%
 \chapter{Design and implementation}\label{design}
