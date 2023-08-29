@@ -588,7 +588,7 @@ NS\cite{fromentin2016exploring}的基线实现使用了公开的先进算法.
 \subsection{Isolated Performance Evaluation of Maxclique}
 
 对于基于Depth-Bounded skeleton的Maxclique程序的每组运行时间测试各进行十次取平均值后的结果如\cref{fig:time_comparison_max_solo}所示,
-其中分为运行时间评估与基于Performance-Driven Workstealing Policy比原来的DepthPool Workstealing Policy的运行速度提升两个部分.
+其中分为运行时间评估与基于Performance-Driven Workstealing Policy比原来的DepthPool Workstealing Policy的运行速度提升评估两个部分.
 
 速度提升部分的计算公式为
 \begin{equation}
@@ -621,7 +621,7 @@ NS\cite{fromentin2016exploring}的基线实现使用了公开的先进算法.
           但是理论上开销的增加相比对于优化窃取目标带来的提升是微不足道的.
     \item 从应用实现进行研究和测试的具体数据上分析后,
           发现应该主要是由于性能异常\ref{sec:performance_anomalies}的原因,
-          基于Depth-Bounded skeleton的Maxclique程序相比其它应用具有更高的性能异常的概率,
+          基于Depth-Bounded skeleton的Maxclique程序相比其它应用具有更高的超线性减速的概率,
           为了验证这一推测,除了对YewPar代码进行分析外,
           我们还对基于Depth-Bounded skeleton的Maxclique程序进行了运行时间的波动情况的分析,
           以节点数量为10时的数据为例,
@@ -632,11 +632,12 @@ NS\cite{fromentin2016exploring}的基线实现使用了公开的先进算法.
               \caption{Runtime fluctuations for maxclique-16 application based on two different policies using 10 localities.}
               \label{fig:maxclique_16_fluctuations}
           \end{figure}
-          在评估\texttt{maxclique-16}应用的运行时间波动性时,
+          在评估Maxclique-16应用的运行时间波动性时,
           我们计算了最大值与最小值之间的差异百分比.
           这可以通过以下公式得出：
           \begin{equation}
               \text{Variability Percentage} = \left( \frac{\text{Max Value} - \text{Min Value}}{\text{Min Value}} \right) \times 100\%
+              \label{eq:variability_percentage}
           \end{equation}
           对于基于Performance-Driven Workstealing Policy的maxclique-16应用,
           最大差异百分比为43.98\%。
@@ -655,18 +656,19 @@ NS\cite{fromentin2016exploring}的基线实现使用了公开的先进算法.
           生成了更多的额外任务拖慢了程序的运行速度.
           而且更多节点时越容易导致窃取目标的变动,所以带来的速度提升会相对降低.
 
-          由于这些数据和性能异常的情况相符,从而验证了我们的推测.
+          由于这些数据和性能异常中描述的情况相符,从而验证了我们的推测.
 
           而虽然窃取目标的变动会导致额外的任务生成,
           但是我们注意到\cref{fig:time_comparison_max_solo}在15节点到20个节点数量的区间中,
           运行速度还是相对有了提升,
           应该是由于优化窃取目标带来的收益相比于额外任务带来的损耗逐渐变大导致的.
-
 \end{itemize}
 
 
 \subsection{Isolated Performance Evaluation of NS-hivert}
 
+对于基于Budget skeleton的NS-hivert程序的每组运行时间测试各进行十次取平均值后的结果如\cref{fig:time_comparison_ns_solo}所示,
+也分为运行时间评估与基于Performance-Driven Workstealing Policy比原来的DepthPool Workstealing Policy的运行速度提升评估两个部分.
 
 \begin{figure}[h]
     \centering % 让图片居中显示
@@ -676,11 +678,68 @@ NS\cite{fromentin2016exploring}的基线实现使用了公开的先进算法.
 \end{figure}
 \FloatBarrier
 
+可以看出在单独运行的情况下,
+基于Performance-Driven Workstealing Policy的NS-hivert程序在不同节点数量都具有更优的性能,
+能以更短的时间完成所有任务.
+其中速度的提升随着节点数量的增加而增加,
+在节点数量为20时,速度的提升达到了平均10.06\%,
+考虑到这只是通过调整Workstealing Policy达到的整体速度提升,
+并没有对YewPar其它部分进行改动,
+并且有性能异常\ref{sec:performance_anomalies}等其它因素产生的负面影响,
+所以这一结果已经是非常优秀的.
+
+相比于Maxclique程序,
+这里节点数量增多时使用Performance-Driven Workstealing Policy带来的速度提升更为明显,
+这是由于NS-hivert程序运行时性能异常\ref{sec:performance_anomalies}产生的负面影响较小,
+同样我们对NS-hivert程序的运行时间波动性进行了分析,
+如\cref{fig:NS_hivert_fluctuations}所示.
+
+\begin{figure}[h]
+    \centering
+    \includegraphics[width=0.8\textwidth]{images/NS_hivert_fluctuations.pdf}
+    \caption{Runtime fluctuations for maxclique-16 application based on two different policies using 10 localities.}
+    \label{fig:NS_hivert_fluctuations}
+\end{figure}
+\FloatBarrier
+
+通过使用\cref{eq:variability_percentage}进行最大差异百分比计算,
+对于基于Performance-Driven Workstealing Policy的maxclique-16应用,
+最大差异百分比为0.57\%。
+而对于基于DepthPool Workstealing Policy的应用,
+最大差异百分比为1.22\%。
+这相对于Maxclique程序的运行时间波动性是非常小的,
+所以推测出NS-hivert程序运行时变更任务执行顺序产生的超线性减速概率较小.
+这时速度提升的主要原因应该是由于优化窃取目标带来的收益导致的.
 
 
 \section{Simultaneous Performance Evaluation under Resource Contention}
 
+这里主要评估在各节点的计算资源不均衡,有争用的情况下,
+基于新的Performance-Driven Workstealing Policy的YewPar与原版在性能上的差异.
+因为实际部署环境可能很复杂,
+不同节点有不同的计算资源占用情况,
+通过对比在资源争用的情况下Performance-Driven Workstealing Policy的表现,
+能够更全面地评估其性能.
+
+为了模拟不同节点的计算资源占用情况,
+我们使用了一种简单的方法,
+通过直接同时运行基于不同Policy的YewPar程序,
+让两种程序在同一时间内同时运行,
+由于两种程序设置的各节点使用的线程数均和各节点的所拥有的核心数相同,
+从而产生较为严重的资源争用,
+而由于原版的DepthPool Workstealing Policy所采用的策略是偏随机窃取的,
+所以也能够较好地模拟负载不均衡的情况下的资源争用.
+
+但是这样会产生一个问题,
+就是当其中一个程序运行完毕后,
+剩下的程序会重新独占所有的计算资源,
+所以下面评估结果中Performance-Driven Workstealing Policy所产生的性能提升会相对实际情况有所低估,
+但是这样的评估结果仍然能够反映出两种Policy在各节点的计算资源不均衡和争用的情况下的性能差异.
+
 \subsection{Simultaneous Performance Evaluation of Maxclique}
+
+对于基于Depth-Bounded skeleton的Maxclique程序的每组同时运行情况下的运行时间测试,各进行十次取平均值后的结果如\cref{fig:time_comparison_max_simu}所示,
+其中也分为运行时间评估与基于Performance-Driven Workstealing Policy比原来的DepthPool Workstealing Policy的运行速度提升评估两个部分.
 
 \begin{figure}[h]
     \centering % 让图片居中显示
@@ -690,9 +749,24 @@ NS\cite{fromentin2016exploring}的基线实现使用了公开的先进算法.
 \end{figure}
 \FloatBarrier
 
+可以看出Maxclique虽然有较为严重的超线性减速的情况,
+但是在各节点负载不均衡的情况下,
+基于Performance-Driven Workstealing Policy的Maxclique应用的运行速度优势有了明显的提升.
+例如在节点数量为20时,速度提升比例从单独运行时的1.11\%提升至了同时运行时的8.01\%,
+提升了接近8倍.
+推测这是由于在负载不均衡的情况下,
+优化窃取目标带来的优势明显大过了额外任务带来的损耗.
+同时从图中可以看出,
+在节点数从10到15时,
+额外任务的损耗降低了一些运行速度的提升,
+但是随着节点数的增多,
+优化窃取目标带来的优势又开始逐渐显现.
+
 
 \subsection{Simultaneous Performance Evaluation of NS-hivert}
 
+对于基于Budget skeleton的NS-hivert程序的每组同时运行情况下的运行时间测试,各进行十次取平均值后的结果如\cref{fig:time_comparison_ns_simu}所示,
+其中也分为运行时间评估与基于Performance-Driven Workstealing Policy比原来的DepthPool Workstealing Policy的运行速度提升评估两个部分.
 
 \begin{figure}[h]
     \centering % 让图片居中显示
@@ -701,6 +775,16 @@ NS\cite{fromentin2016exploring}的基线实现使用了公开的先进算法.
     \label{fig:time_comparison_ns_simu} % 为图片提供一个标签，以便在文档的其他地方引用
 \end{figure}
 \FloatBarrier
+
+从图中可以看出在基于Budget skeleton的NS-hivert程序中,
+Performance-Driven Workstealing Policy对于性能的提升更加明显,
+从5个节点数时的9.36\%逐步提升至20个节点时的13.46\%,
+考虑到Workstealing Policy相对于整个YewPar框架和NS-hivert程序的优化空间很小,
+所以达到13.46\%的性能提升是非常优秀的.
+
+从图中节点数从15到20时的很小的提升幅度可以推测,
+此时的性能提升比例已经接近于Workstealing部分可提升的极限,
+其它时间大多消耗在处理任务和YewPar框架的其它开销上.
 
 
 %%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%
