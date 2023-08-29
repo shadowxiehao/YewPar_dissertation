@@ -46,12 +46,60 @@
 
 %%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%
 \begin{abstract}
-    abstract goes here
+
+    % \begin{comment}
+    % 精确组合搜索对于包括约束编程、图匹配和计算代数在内的广泛应用都是必不可少的。
+    % 而并行化计算也是加速组合搜索的重要手段之一,
+    % Workstealing是实现并行化计算的一种重要策略,
+    % 当有节点的计算资源空闲时,通过窃取其它节点的剩余任务来利用空闲的计算资源,从而提高整体性能。
+    % YewPar is a very good parallel framework designed for combinatorial search.
+    % It provides a set of powerful skeletons and policies that allow developers to easily parallelize their search algorithms.
+    % 但是它的workstealing策略是偏向随机挑选有任务的节点进行任务窃取,
+    % 这往往会导致不必要的开销和延迟,
+    % 我们的目标是通过设计一种新的workstealing策略来提高基于YewPar框架的应用的运行速度.
+
+    % 为此我们设计并实现了一种新的基于各节点程序的多项性能参数来实时调整任务窃取的目标节点的Performance-Driven Workstealing Policy框架,
+    % 它的主要理念是通过尽量去窃取负载较高的节点的任务来达到接近负载均衡的状态,从而缩短最后完成任务的worker的时间,
+    % 并且通过减少不必要的探测时间来缩短无任务worker的饥饿时间,
+    % 最终缩短基于YewPar的应用在并行情况下的运行完成时间.
+
+    % 并且我们对改进workstealing策略后的YewPar进行了评估,
+    % 评估在具有多核机器的Beowulf集群上进行,
+    % 结果表明,改进后的YewPar在不同节点数量和负载情况下相比原YewPar能够获得更好的性能,
+    % 能在不影响搜索结果的情况下不同程度的有效缩短基于YewPar的搜索应用的执行时间,
+    % 在多数情况下对于其运行速度的提升非常显著.
+    % \end{comment}
+
+    Exact combinatorial search is indispensable for a wide range of applications, including constraint programming, graph matching, and computational algebra.
+    Parallel computation serves as a vital method to accelerate these combinatorial searches.
+    Workstealing is a key strategy for achieving parallelization.
+    By pilfering remaining tasks from other nodes when a node's computational resources are idle,
+    it capitalizes on the available computational resources, thereby enhancing the overall performance.
+    YewPar is an exemplary parallel framework designed specifically for combinatorial search.
+    It offers a suite of potent skeletons and policies, enabling developers to seamlessly parallelize their search algorithms.
+    However, its Workstealing strategy predominantly leans towards randomly selecting nodes with tasks for pilfering.
+    This often results in unnecessary overheads and delays.
+    Our objective is to boost the execution speed of applications based on the YewPar framework by introducing a novel Workstealing strategy.
+
+    To this end, we have devised and implemented a new Performance-Driven Workstealing Policy framework that dynamically adjusts the target node for task pilfering based on multiple performance parameters of each node's program.
+    The core philosophy behind this approach is to strive for near load-balancing by predominantly pilfering tasks from nodes with higher loads, thereby minimizing the completion time of the last finishing worker.
+    Moreover, by curtailing unnecessary probing time, it significantly reduces the starvation time of task-less workers.
+    Ultimately, this results in a marked reduction in the execution time of YewPar-based applications in parallel scenarios.
+
+    We have also evaluated the improved YewPar with the enhanced Workstealing strategy.
+    The evaluation was conducted on a Beowulf cluster equipped with multi-core machines.
+    The outcomes indicate that, compared to the original YewPar, the revamped YewPar yields superior performance under various node quantities and loads.
+    It can significantly trim the execution time of search applications based on YewPar without compromising the search results.
+    In most instances, the enhancement in its execution speed is remarkably pronounced.
+
+    \textbf{Keywords:} Combinatorial Search, Parallel Computation, Workstealing, YewPar, Performance-Driven Policy, Beowulf Cluster.
+
 \end{abstract}
 %%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%
 
 %%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%
 \educationalconsent
+
 
 %%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%
 
@@ -59,7 +107,17 @@
 %%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%
 \section*{Acknowledgements}
 
-acknowledgements go here
+It took months almost entirely to focus on this project and do this dissertation.
+As a student unfamiliar with the topic initially,
+I have done much work with effort and interest to gain knowledge regarding the YewPar framework,
+Combinatorial Search and Workstealing concepts related to the project.
+
+So, I would like to thank my supervisor Blair Archibald, who helped me a lot in completing this project.
+He discussed the project with me every week and gave me a lot of advice, which benefited me
+greatly.
+
+I would also like to thank my family for their love and support throughout my life. Also, my
+roommates and other friends, who encouraged me a lot during my project.
 
 %%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%
 \tableofcontents
@@ -75,11 +133,10 @@ acknowledgements go here
 结合并行性、按需树生成、搜索启发式和剪枝可以减少精确搜索的执行时间。
 由于巨大且高度不规则的搜索树，并行化精确组合搜索是极具挑战性的.
 
-
 而其中有名为YewPar\cite{10.1145/3332466.3374537}的框架,这是第一个用于精确组合搜索的可扩展并行框架。
 YewPar旨在允许非专业用户从并行中受益;
-重用编码为算法骨架的并行搜索模式(to reuse parallel search patterns encoded as algorithmic
-skeletons);并能在多个并行架构上运行。
+重用编码为算法骨架的并行搜索模式(to reuse parallel search patterns encoded as algorithmic skeletons);
+并能在多个并行架构上运行。
 
 与此同时,随着并行计算和多核处理器的普及,有效的任务调度变得越来越重要.
 能并行加速搜索是YewPar的一个关键特性,这是通过各个节点的多个worker在本地任务池无任务时向其它节点的任务池窃取任务来实现节点空闲资源的利用。
@@ -90,14 +147,20 @@ skeletons);并能在多个并行架构上运行。
 这往往会导致不必要的开销和延迟,浪费了大量试探窃取任务的时间,同时导致各节点的相对负载不均衡,延长了最终完成的时间。
 目前也有很多关于workstealing的改进,但是不能很好的兼顾到低开销,去中心化,高负载均衡,高性能,高可扩展性等特性.
 
+我们的目标是通过改进YewPar的Workstealing策略来提高其性能,
+为此本文提出了新的Performance-Driven Workstealing Policy框架,
+它的主要理念是通过尽量去窃取负载较高的节点的任务来达到接近负载均衡的状态,从而缩短最后完成任务的worker的时间,
+并且通过减少不必要的探测时间来缩短无任务worker的饥饿时间,
+最终缩短基于YewPar的应用在并行情况下的运行完成时间.
 
-相比之下,本文提出了Performance-Driven Workstealing Policy,
-并为之设计了新的框架能定期监测与传输多项有价值的数据,
+它具有多项功能,
+能定期监测与传输多项有价值的数据,
 并计算缓存最优窃取目标节点,
-它能够以低成本搜集多项性能指标,如各节点的任务执行时间、处理器的工作/空闲时间比例和任务池获取的耗时,
+它能够通过自研的架构和数据处理算法以低成本搜集和分享多项性能指标,
+如各节点的任务执行时间、处理器的工作/空闲时间比例和任务池获取的耗时,
 并通过自研的Time-Optimized Workstealing Strategy算法计算出最优窃取目标节点并缓存和定时刷新,
-当有worker空闲时便能直接从缓存获取最近一段时间的最优窃取目标,从而能很好的在多节点去中心化的环境下以较低成本缩短完成全部任务所需的时间.
-
+当有worker空闲时便能直接从缓存获取最近一段时间的最优窃取目标,
+从而能很好的在多节点去中心化的设计下以较低成本缩短完成全部任务所需的时间.
 
 本文对具体的设计与实现细节进行了剖析,
 其中Performance-Driven Workstealing Policy在搜集性能参数时采用了平台无关与去中心化的设计,
@@ -111,11 +174,11 @@ skeletons);并能在多个并行架构上运行。
 而空闲的worker则会在试图获取缓存目标任务失败时进行一次称为辅助刷新的操作,帮助此时可能处在休眠的刷新器进行刷新最优窃取目标缓存的任务.
 这些工作结合起来便能够实现Performance-Driven Workstealing Policy的加速效果.
 
-
-本文同时对改进workstealing策略后的YewPar进行了评估,
+本文还对改进workstealing策略后的YewPar进行了评估,
 评估在具有多核机器的Beowulf集群上进行,
-结果表明,改进后的YewPar在不同节点数量和线程下相比原YewPar平均能够获得更好的性能,
-能在不影响搜索结果的情况下不同程度的有效缩短执行完全部任务所需的时间.
+结果表明,改进后的YewPar在不同节点数量和负载情况下相比原YewPar能够获得更好的性能,
+能在不影响搜索结果的情况下不同程度的有效缩短基于YewPar的搜索应用的执行时间,
+在多数情况下对于其运行速度的提升非常显著.
 
 
 %%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%
@@ -203,7 +266,7 @@ YewPar需要一种更加智能的workstealing策略。
 通过低成本评估每个节点的性能如平均任务执行时间等,新策略可以更精确地刷新最优窃取目标,从而提高整体性能。
 
 %%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%
-\chapter{Design and implementation}
+\chapter{Design and implementation}\label{design}
 
 \section{总体设计}
 
@@ -295,7 +358,7 @@ Performance Policy负责调取本地任务池任务或者从Performance Monitor�
 \begin{figure}[h]
     \centering % 让图片居中显示
     \includegraphics[width=1.0\textwidth]{images/worker_collect_calculate.pdf} % 插入图片，设置图片宽度为文本宽度的80%
-    \caption{collect worker state to calculate the work load} % 提供图片的注解
+    \caption{collect worker state to calculate the workload} % 提供图片的注解
     \label{fig:worker_collect_calculate} % 为图片提供一个标签，以便在文档的其他地方引用
 \end{figure}
 \FloatBarrier
@@ -697,7 +760,7 @@ NS\cite{fromentin2016exploring}的基线实现使用了公开的先进算法.
 \begin{figure}[h]
     \centering
     \includegraphics[width=0.8\textwidth]{images/NS_hivert_fluctuations.pdf}
-    \caption{Runtime fluctuations for maxclique-16 application based on two different policies using 10 localities.}
+    \caption{Runtime fluctuations for Maxclique-16 application based on two different policies using 10 localities.}
     \label{fig:NS_hivert_fluctuations}
 \end{figure}
 \FloatBarrier
@@ -783,16 +846,63 @@ Performance-Driven Workstealing Policy对于性能的提升更加明显,
 所以达到13.46\%的性能提升是非常优秀的.
 
 从图中节点数从15到20时的很小的提升幅度可以推测,
-此时的性能提升比例已经接近于Workstealing部分可提升的极限,
-其它时间大多消耗在处理任务和YewPar框架的其它开销上.
+随着节点数增加带来的性能提升比例已经接近于Workstealing部分可提升的极限,
+其它程序运行的时间大多消耗在处理任务和YewPar框架的其它开销上.
 
 
 %%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%
 \chapter{Conclusion}\label{conclusion}
 
-Main conclusions of your project. Here you should also include suggestions for future work.
+我们的目标是通过改进YewPar的Workstealing策略来提高其性能,
+为此设计并实现了一种通过各节点的各项性能数据来优化Workstealing时的窃取目标的Performance-Driven Workstealing Policy,
+其中包含性能数据的收集,处理,传输,
+,对于最优窃取目标的计算和缓存,
+以及一套包含两种方式的刷新机制.
+通过针对多线程和多节点通讯的优化设计,
+以很低的成本实现了对于程序运行速度的提升,
+并具有很好的兼容性.
+
+从评估结果来看,
+我们的Performance-Driven Workstealing Policy在Workstealing方面的优化效果是非常明显的,
+在无计算资源占用的情况下,
+运行程序速度的提升已经能达到8\%以上,
+而在各节点资源占用不均衡,有争用的情况下,
+运行程序速度的提升能高达到13\%以上.
+考虑到这只是通过优化YewPar中的Workstealing Policy达到的整体速度提升,
+而程序大部分时间花在处理任务和生成新的任务等情况上,
+所以通过各节点程序的性能数据调整窃取目标的方法是非常有效的,
+而Performance-Driven Workstealing Policy在不同情况都是非常优秀的Workstealing Policy,
+完全可以取代YewPar原先的Workstealing Policy.
 
 \section{future work}
+
+\subsection{各项参数的自动调整}
+
+在之前的\ref{design}章节中,
+程序有一些算法的固定参数例如指数平滑算法中的历史数据所占比例是根据测试得出的一个较优的值,
+而在实际更复杂的情况下,
+这些参数可能有更优的选择和具有更多优化的空间,
+所以可以考虑通过设计一套自动调整这些参数的算法,
+来保障各种情况下Performance-Driven Workstealing Policy内部的各种参数都能达到一个较优的状态.
+
+\subsection{针对并行组合搜索的性能异常情况的优化}
+
+在之前的评估环节可以看出Maxclique程序下,
+Performance-Driven Workstealing Policy对于窃取目标的频繁变动更多地破坏了搜索启发式方法,
+打乱了任务执行的顺序,
+导致了更多的额外用于推测上下文的任务生成,
+从而拖慢了程序的整体运行速度,
+可以考虑设计一套算法将避免破坏任务执行的顺序也包含在计算窃取目标的过程中,
+可能能减少额外任务的生成,
+从而进一步提升程序在多节点多线程情况下的运行速度.
+
+\subsection{替代全部的YewPar Workstealing Policy}
+
+Performance-Driven Workstealing Policy目前替代了例如YewPar中的DepthPool Policy,
+从而提升了YewPar中的一些skeleton的性能,
+但是由于时间原因还未去尝试替代例如Priority Ordered Policy,
+所以暂时未能让YewPar的全部skeleton都能受益于Performance-Driven Workstealing Policy.
+这个可以作为后续的工作进行尝试.
 
 
 \appendix % first appendix
