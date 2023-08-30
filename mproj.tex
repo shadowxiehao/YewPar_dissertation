@@ -188,6 +188,110 @@ YewPar旨在允许非专业用户从并行中受益;
 %%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%
 \chapter{Survey}\label{survey}
 
+
+\section{Modern Strategies in Distributed Concurrency}
+\subsection{Workstealing}
+Workstealing 是并行编程中的一个核心概念。
+其主要优点在于分散调度,让每个处理器自主地管理其任务队列,从而显著降低了全局同步所带来的开销.
+工作窃取的想法可以追溯到20世纪80年代Multilisp编程语言的实现和并行函数式编程语言的工作\cite{10.1145/324133.324234}。
+它用于Cilk编程语言的调度程序\cite{BLUMOFE199655}、
+Java fork/join框架\cite{lea2000forkjoin}、
+.NET任务并行库\cite{leijen2009design}、
+和Rust Tokio 运行时\cite{tokio,krill2021tokio}。
+和其它众多的并行框架和库。
+
+\begin{figure}[h]
+    \centering % 让图片居中显示
+    \includegraphics[width=0.98\textwidth]{images/workstealing.pdf} % 插入图片，设置图片宽度为文本宽度的80%
+    \caption{Workstealing example} % 提供图片的注解
+    \label{fig:workstealing} % 为图片提供一个标签，以便在文档的其他地方引用
+\end{figure}
+\FloatBarrier
+
+如\cref{fig:workstealing},
+在workstealing策略中,系统内的每个处理器都有自己的待执行任务队列.
+每个任务都由一系列指令组成,这些指令需要按顺序执行。
+在执行的过程中,一个任务还可能生成新的子任务.
+这些子任务被初步放入生成它们的任务所在的处理器队列.
+当某处理器的任务队列为空时,它会尝试从其他处理器的队列中“窃取”任务.
+这样,workstealing 实际上将任务调度到了空闲的处理器上,
+并保证了只有在所有处理器都繁忙时才会发生调度开销.\cite{10.1145/1248377.1248396}
+
+与workstealing形成对比的是工作共享策略,
+它是动态多线程调度的另一种方法。
+在工作共享中,新产生的任务会被立即调度到一个处理器上执行。
+相较于此,workstealing减少了处理器间的任务迁移,
+因为当所有处理器都繁忙时,这种迁移是不会发生的.\cite{10.1145/324133.324234}
+
+而其中的算法如Blumofe和Leiserson提出的随机化工作窃取算法,
+维护了多个执行线程(异步任务)并在P个处理器上进行调度\cite{10.1145/324133.324234}。
+每个处理器都有一个双端队列(deque)用于存放线程,
+它将deque的两端称为"顶部"和"底部"。
+当处理器有当前线程需要执行时,
+它会逐条执行线程中的指令,
+直到遇到引起四种"特殊"行为中的一种:
+\begin{itemize}
+    \item “生成”指令会创建一个新的线程。当前线程被放置在deque的底部,处理器开始执行新线程。
+    \item “暂停”指令会暂时停止其线程的执行。处理器从其deque的底部弹出一个线程并开始执行。如果deque为空,它开始执行工作窃取。
+    \item 某些指令可能导致线程终止。在这种情况下的行为与线程暂停的行为相同。
+    \item 指令可能激活另一个线程。这个其他线程被推到deque的底部,但处理器继续执行其当前线程。
+\end{itemize}
+最初，计算只包含一个线程，并分配给某个处理器，而其他处理器开始为空闲。
+任何变为空闲的处理器都开始实际的工作窃取过程，包括以下步骤:
+\begin{itemize}
+    \item 它随机选择另一个处理器。
+    \item 如果另一个处理器的deque非空,它会从deque的顶部弹出最上面的线程并开始执行;
+    \item 否则，重复上述过程。
+\end{itemize}
+
+但是类似这种随机窃取策略在多节点复杂环境中往往有较大的开销.
+这些开销主要来源于“窃贼”在集群中随机地探测节点以寻找“受害者”.
+加之集群规模的不均匀分布,这种问题变得更为严重,
+导致系统消息量过大以及“窃贼”由于多次窃取失败和网络延迟而产生的长时间饥饿状态.
+尽管关于workstealing的优化尝试从未停歇,
+例如通过建立固定的"媒人"节点,
+让有多余任务的节点和无任务的节点通知媒人节点自己当前的状态,
+从而能让"媒人"节点匹配任务饥饿和任务丰富的节点,
+从而让无任务节点找到有多余任务的节点进行任务的窃取\cite{10.1145/2851141.2851175},
+但是其"媒人"节点的维护和在出现任务饥饿时向"媒人"节点发送查询请求的等待时间等仍然是不可忽视的开销,
+同时它只是匹配了有额外任务的节点和无任务的节点使其能进行任务窃取,
+但是没有针对节点的各项性能参数情况来进行优化,
+可以会导致频繁的发生窃取浪费了不必要的时间;
+或者专门针对Multicore Event-Driven Systems设计的窃取策略\cite{5541655},
+它特别考虑了事件驱动编程的特点，有效提高在这种环境下的并行度,减少了窃取开销,
+但是其但维护任务随机化和延迟窃取策略带来了不少额外的开销,
+并且对于非事件驱动的应用不能很好地适用.
+
+还未有一种很好的通用化的低开销、轻量化、跨平台且高效的策略出现。
+Workstealing仍主要处于针对各种应用环境进行针对性优化的阶段。
+而文本的设计的任务窃取方案是基于各节点性能数据主要是采用基于worker,各节点剩余任务量和各节点通讯延迟的性能数据,
+这些数据可以很轻松的在其它采用Workingstealing策略的框架中获取,
+所以具有很好的可移植性和通用性,
+可以更轻松地将这套方案移植到除了YewPar以外其它平台与框架上,
+而且设计也具有轻量化的特点.
+
+\subsection{The Pitfalls of Locking Mechanisms and the Promise of Lock-Free Designs}\label{survey_lock}
+在多线程的优化是一个很热门的领域,
+其中锁机制被设计用来解决并发操作中的数据不一致问题,
+而Edward A. Lee曾提出锁机制是多线程最主要的问题之一\cite{1631937},
+锁会导致线程等待，从而造成性能损耗。在高并发环境下，这种等待可能会导致严重的性能瓶颈。
+也会导致当多个线程尝试获取同一个锁时进入竞争状态。
+这种竞争状态不仅降低了性能，还可能导致线程饥饿，其中一些线程可能永远无法获取到锁。
+Lee强调,尽管有许多方法可以缓解这些问题,
+但根本解决方案是寻找替代多线程的编程方法和模型,其中无锁编程就是一个有前景的方向。
+
+而无锁设计目前已有很多优秀的实践,
+比如有无锁的并发队列算法，
+使得多个线程可以在没有锁的情况下并发地访问和修改队列\cite{10.1145/248052.248106};
+还有一种动态的、基于无锁设计的哈希表,由于避免了锁的开销，该设计在高并发环境下可以提供出色的性能\cite{10.1145/564870.564881}.
+
+而本文也借鉴了一些无锁化的设计,
+设计了无锁化的数据结构和算法,
+让本文的Performance-Driven Workstealing Policy框架在保证数据正确的同时,
+避免了锁对性能的影响,
+也一定程度保障了本文的框架的轻量化和高性能.
+
+
 \section{组合搜索}
 \begin{comment}
 在计算机科学和人工智能中,组合搜索是一种用于在给定的搜索空间中找到解决方案的方法。
@@ -214,7 +318,7 @@ YewPar旨在允许非专业用户从并行中受益;
     \centering % 让图片居中显示
     \includegraphics[width=0.98\textwidth]{images/yewpar_maxclique.pdf} % 插入图片，设置图片宽度为文本宽度的80%
     \caption{Maximum clique instance in YewPar. Input graph with clique \{a,d,f,д\} to the left and corresponding search tree to the right.
-    Each tree node displays the current clique and a list of candidate vertices (in heuristic order) to extend that clique.\cite{10.1145/3332466.3374537}} % 提供图片的注解
+        Each tree node displays the current clique and a list of candidate vertices (in heuristic order) to extend that clique.\cite{10.1145/3332466.3374537}} % 提供图片的注解
     \label{fig:yewpar_maxclique} % 为图片提供一个标签，以便在文档的其他地方引用
 \end{figure}
 \FloatBarrier
@@ -247,56 +351,7 @@ YewPar的主要特点是其灵活性和可扩展性,
 Yew-Par旨在避免有害的异常,同时允许加速异常;
 \cite{ARCHIBALD201892}报告了一个专门的搜索框架，该框架仔细控制异常以提供可复制的性能保证。
 
-\section{workstealing}
-Workstealing 是并行编程中的一个核心概念。
-其主要优点在于分散调度,让每个处理器自主地管理其任务队列,从而显著降低了全局同步所带来的开销.
-众多并行框架和库,如 Cilk、TBB 和 OpenMP,都已经采纳了这种方法。
-
-\begin{figure}[h]
-    \centering % 让图片居中显示
-    \includegraphics[width=0.98\textwidth]{images/workstealing.pdf} % 插入图片，设置图片宽度为文本宽度的80%
-    \caption{Workstealing example} % 提供图片的注解
-    \label{fig:workstealing} % 为图片提供一个标签，以便在文档的其他地方引用
-\end{figure}
-\FloatBarrier
-
-如\cref{fig:workstealing},
-在workstealing策略中,系统内的每个处理器都有自己的待执行任务队列.
-每个任务都由一系列指令组成,这些指令需要按顺序执行。
-在执行的过程中,一个任务还可能生成新的子任务.
-这些子任务被初步放入生成它们的任务所在的处理器队列.
-当某处理器的任务队列为空时,它会尝试从其他处理器的队列中“窃取”任务.
-这样,workstealing 实际上将任务调度到了空闲的处理器上,
-并保证了只有在所有处理器都繁忙时才会发生调度开销.\cite{10.1145/1248377.1248396}
-
-与workstealing形成对比的是工作共享策略,
-它是动态多线程调度的另一种方法。
-在工作共享中,新产生的任务会被立即调度到一个处理器上执行。
-相较于此,workstealing减少了处理器间的任务迁移,
-因为当所有处理器都繁忙时,这种迁移是不会发生的.\cite{10.1145/324133.324234}
-
-尽管如此,传统的随机窃取策略在多节点复杂环境中往往有较大的开销.
-这些开销主要来源于“窃贼”在集群中随机地探测节点以寻找“受害者”.
-加之集群规模的不均匀分布,这种问题变得更为严重,
-导致系统消息量过大以及“窃贼”由于多次窃取失败和网络延迟而产生的长时间饥饿状态.
-尽管关于workstealing的优化尝试从未停歇,
-例如通过建立固定的"媒人"节点,
-让有多余任务的节点和无任务的节点通知媒人节点自己当前的状态,
-从而能让"媒人"节点匹配任务饥饿和任务丰富的节点,
-从而让无任务节点找到有多余任务的节点进行任务的窃取\cite{10.1145/2851141.2851175},
-但是其"媒人"节点的维护和在出现任务饥饿时向"媒人"节点发送查询请求的等待时间等仍然是不可忽视的开销,
-同时它只是匹配了有额外任务的节点和无任务的节点使其能进行任务窃取,
-但是没有针对节点的各项性能参数情况来进行优化,
-可以会导致频繁的发生窃取浪费了不必要的时间;
-或者专门针对Multicore Event-Driven Systems设计的窃取策略\cite{5541655},
-它特别考虑了事件驱动编程的特点，有效提高在这种环境下的并行度,减少了窃取开销,
-但是其但维护任务随机化和延迟窃取策略带来了不少额外的开销,
-并且对于非事件驱动的应用不能很好地适用.
-
-还未有一种很好的通用化的去中心化、低开销、轻量化、跨平台且高效的策略出现。
-workstealing仍主要处于针对各种应用环境进行针对性优化的阶段。
-
-\section{为什么要在YewPar中设计并使用新的workstealing策略}
+\subsection{为什么要在YewPar中设计并使用新的workstealing策略}
 
 YewPar采用workstealing作为其核心的分布式并行化调度策略,
 但其采用的是偏随机窃取的策略\cite{archibald2019yewpar},
@@ -317,20 +372,19 @@ YewPar需要一种更加智能的workstealing策略。
 新策略采用根据各性能参数设计的窃取算法可以更精确地动态刷新最优窃取目标,
 提高整体性能。
 
-同时由于这套方案是基于各节点性能数据主要是采用基于worker,各节点剩余任务量和各节点通讯延迟的性能数据,
-这些数据可以很轻松的在其它采用Workingstealing策略的框架中获取,
-所以具有很好的可移植性和通用性,
-可以更轻松地将这套方案移植到除了YewPar以外其它平台与框架上.
+
 
 %%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%
 \chapter{Design and implementation}\label{design}
 
 \section{总体设计}
 
-本文为了Performance-Driven Workstealing Policy设计了一套新的框架,
-框架包含Scheduler Channel(主要负责监测与统计与传输节点所有workers的负载状态),
-Performance Monitor(主要负责统计各项性能数据与发送各项处理后的本地性能数据,并计算和缓存最优窃取目标节点的id),
-和Performance Policy(在本地任务池无任务时,主要负责从Performance Monitor获取最优窃取目标).
+本文设计的Performance-Driven Workstealing Policy框架包含了:
+\begin{itemize}
+    \item Scheduler Channel(主要负责监测与统计与传输节点所有workers的负载状态).
+    \item Performance Monitor(主要负责统计各项性能数据与发送各项处理后的本地性能数据,并计算和缓存最优窃取目标节点的id).
+    \item Performance Policy(在本地任务池无任务时,主要负责从Performance Monitor获取最优窃取目标)
+\end{itemize}
 
 组件之间的关系大致如\cref{fig:overall_architecture}所示.
 \begin{figure}[h] % 'h'表示图片尽量在当前位置
@@ -369,11 +423,12 @@ Performance Policy负责调取本地任务池任务或者从Performance Monitor�
 \end{figure}
 \FloatBarrier
 
-其中Policy负责被worker调用时,通过自己的策略试图获取任务
-(最终会从本地池获取或从其它节点任务池偷取任务),
-真正负责执行任务的是YewPar的worker,
-所以如果想要不依赖系统底层函数获得各节点的负载情况,就需要获取各节点的worker的负载情况.
-本文对worker的工作流程进行了分析,如\cref{fig:period_of_worker}
+其中Policy负责被worker调用时,
+通过尝试图从本地池获取任务或从其它节点任务池偷取任务,
+而真正负责执行任务的是YewPar的各个worker,
+所以如果想要不依赖系统底层函数获得各节点的负载情况,
+比较简单好用的方法就是去获取各节点的workers的负载情况.
+本文对YewPar框架下的worker的工作流程进行了分析,如\cref{fig:period_of_worker}
 
 \begin{figure}[h]
     \centering % 让图片居中显示
@@ -385,13 +440,11 @@ Performance Policy负责调取本地任务池任务或者从Performance Monitor�
 
 可以看出每个worker从创建到销毁之间,
 它的生命周期都处在一个循环中,其中包含了三个可能的阶段:
-
-1.调用Policy的getWork函数获取任务;
-
-2.如果获取到任务则执行该任务;
-
-3.如果没有获取到任务则休眠一段时间,
-这段时间随着没有获取到任务的次数的增加而增加,当再次获取到任务时则时间重置
+\begin{enumerate}
+    \item 调用Policy的getWork函数获取任务;
+    \item 如果获取到任务则执行该任务;
+    \item 如果没有获取到任务则休眠一段时间,这段时间随着没有获取到任务的次数的增加而增加,当再次获取到任务时则时间重置.
+\end{enumerate}
 
 这三个阶段中,第一阶段是每次循环都会经历的阶段,
 而第二阶段和第三阶段则是互斥关系,每次循环只会经历其中一个阶段.
@@ -420,25 +473,41 @@ Performance Policy负责调取本地任务池任务或者从Performance Monitor�
 \end{figure}
 \FloatBarrier
 
-通过在任务开始执行之前和执行完成后的位置插入探针代码,
-让worker在执行任务前和完成任务后都去Scheduler Channel(一个辅助传输状态的channel)中更新自己的状态,
-并计算自己的负载数据,
-方便后续Performance-Driven Policy获取这些数据进行计算.
+通过在任务执行的开始和结束位置插入探测代码(一旦执行,即暂停当前流程,转而执行探测相关的操作),
+worker可以在任务执行前后更新其状态到Scheduler Channel模块(一个专用于状态传输的channel).
+这样,worker能够实时计算并更新其负载数据,为Performance Monitor提供所需数据进行进一步计算。
 
-其中Scheduler Channel的统计数据主要由两组长度为workers数量的数组组成,
-一组存储着特定的Record数据结构,
-由一个计时器timer,一个当前状态threadState,一个当前周期的空闲时间idleTime和一个当前周期的工作时间workTime组成,
-方便workers记录自己的具体各状态持续时间等数据,
-由于设计采用一个record对应一个worker的方式,所以record可以不采用锁机制以提升性能;
-另一组存储着采用特定算法计算得出的worker负载率数据workRate,
-由被unique\_ptr包装的原子double类型组成,
-由于可能有worker和Moninter同时访问,所以需要采用原子类型以保证在无锁机制下数据的正确性.
+"Scheduler Channel使用了特定的数据结构来统计数据,
+为了避免使用锁带来的开销,
+它采纳了无锁化的设计策略\cref{survey_lock}.
+这种设计旨在减少workers间在统计负载数据时的竞争.
 
-在"set state to WORKING"阶段,worker主要在channel更新自己这轮周期的空闲时间,并更改状态为WORKING;
-而在"set state to IDLE"阶段,worker主要在channel更新自己这轮周期的工作时间,
-并根据空闲与工作时间与历史workRate数据计算出当前的workRate,并更改状态为IDLE.
+该数据结构主要由两组数组构成,每组的长度均等于本地workers的数量:
+\begin{enumerate}
+    \item Record数组: 这组数组存储特定的Record数据结构,每个Record包括:
+          \begin{itemize}
+              \item 一个计时器timer
+              \item 当前的状态threadState
+              \item 当前周期的空闲时间idleTime
+              \item 当前周期的工作时间workTime
+          \end{itemize}
+          这样的设计允许workers记录自己在各种状态下的持续时间.
+          由于每个worker都对应一个独立的record,所以可以避免使用锁,从而提高性能。
+    \item workRate数组: 这组数组存储了通过特定算法计算出的worker的负载率数据。
+          每个workRate是一个被unique\_ptr包装的原子double类型。
+          虽然worker和Monitor可能会同时访问这些数据,
+          但由于workRate是基础数据类型,
+          所以采用原子类型可以确保在无锁环境下数据的正确性。
+\end{enumerate}
 
-而计算最新的workRate的算法如\cref{eq:workrate}所示:
+这里收集负载数据大致由两种流程组成:
+\begin{itemize}
+    \item 在"set state to WORKING"阶段,worker主要在channel更新自己这轮周期的空闲时间,并更改状态为WORKING;
+    \item 在"set state to IDLE"阶段,worker主要在channel更新自己这轮周期的工作时间,
+          并根据空闲与工作时间与历史workRate数据计算出当前的workRate,并更改状态为IDLE.
+\end{itemize}
+
+在"set state to IDLE"阶段,计算最新的workRate的算法如\cref{eq:workrate}所示:
 
 \begin{align}
     \text{workRate} & = \left( \ln\left( 2.72 + \frac{\text{workTime}}{\text{workTime} + \text{idleTime}} \right) \right. \notag   \\
@@ -449,26 +518,40 @@ Performance Policy负责调取本地任务池任务或者从Performance Monitor�
 公式目的是为了计算当前worker是否繁忙和计算速度是否较慢,主要分为三部分:
 \begin{enumerate}
     \item $\ln\left( 2.72 + \frac{\text{workTime}}{\text{workTime} + \text{idleTime}} \right)$,
-          是由于在每个周期中,如果WORKING状态的持续时间相对IDLE状态的持续时间比值越大,
-          则说明当前任务量较大或者任务较为复杂,所以需要更多的时间来执行任务.
-          同时为了避免数据过于敏感,所以采用了对数函数来降低数据的敏感度,
+          这是由于在每个周期中,如果WORKING状态的持续时间相对IDLE状态的持续时间比值越大,
+          则说明当前任务量较大或者任务较为复杂,所以相对需要更多的时间来执行任务,
+          相反则说明当前worker的任务饥饿时间较长,浪费了大量时间在试探窃取任务等无效负载的时间上.
+          同时因为时间数据采用微秒为单位,数据较大导致数据波动也大,
+          为了避免数据过于敏感,所以采用了对数函数来降低数据的敏感度,
           使用了$(2.72+...)$是为了保证结果永远为正数.
 
     \item $\ln\left( 2.72 + (\text{workTime} + \text{idleTime}) \right)$,
-          是因为如果当前周期的总持续时间越长,则说明当前任务较为复杂或者worker的性能较低,
-          所以需要更多的时间来执行任务.
-          同时也采用了对数函数来降低数据的敏感度.
+          这是考虑到之前比值的结果并不能很好地反应出当前worker的运行速度,
+          可能它处在任务量较小但是由于运行速度慢,所以实际负载还是比较大的情况,
+          所以需要计算当前周期的总耗时,
+          将总耗时乘以之前计算出的比值,就可以得到当前周期的一个实际负载情况,
+          同时由于是微秒级别的时间数据,所以也采用了对数函数来降低数据的敏感度.
 
     \item $(... \times 0.65 +\text{workRate} \times 0.35)$,
-          这是采用了一种称为指数平滑\cite{GARDNER2006637}的算法,通过给与历史数据影响程度一定的系数,
-          防止短期的波动给结果带来较大的影响,从而使得数据更加平滑和更具参考价值.
-          而0.65和0.35则是经过多次测试后得出的一个较为合理的系数,
-          既保留了一些历史参考,也较好地体现了最近的数据变化.
+          这是由于刷新数据可能是间隔一段时间再刷新,
+          所以保留历史负载数据作为参考防止因为短期波动导致对当前worker的负载情况判断失误是很有必要的,
+          而当前记录负载率的数据结构为了节省内存空间的消耗,
+          未设置例如数组或其它结构保存历史负载数据,
+          所以在节省空间的同时为了节省计算时间,
+          这里通过采用了一种称为指数平滑\cite{GARDNER2006637}的简单算法,
+          通过给与历史workRate数据一定的系数和当前workRate数据一定的系数后相加,
+          来让workRate数据既反应了当前的负载情况,也保留了一定的历史数据参考,
+          而系数0.65和0.35则是为了更好地反应当前的负载变化情况,
+          所以设置当前workRate的系数偏大,
+          而历史workRate的系数偏小,
+          之后经过多次在集群环境的测试后得出的一个较为合理的系数,
+          从而使得数据更加平滑和更具参考价值.
 \end{enumerate}
 
-最终,计算出的各个worker的workRate数据会通过提供的本地接口在计算总和并除以worker的数量后递交给Performance Monitor,
-Performance Monitor会将本地workRate数据提交给local distributed component以供其它节点查询.
-
+最终,计算出的各个worker的workRate数据会相加后除以worker的数量算出平均负载数据,
+处理后的数据只是一个double类型的数据,非常轻量,
+这时再递交给Performance Monitor,
+让它将本地workRate数据提交给local distributed component以方便其它节点进行快速查询.
 
 \subsection{各节点剩余任务量与获取花费时间收集}
 
@@ -906,6 +989,32 @@ Performance-Driven Workstealing Policy对于性能的提升更加明显,
 随着节点数增加带来的性能提升比例已经接近于Workstealing部分可提升的极限,
 其它程序运行的时间大多消耗在处理任务和YewPar框架的其它开销上.
 
+\section{Performance-driven Workstealing Policy framework additional Performance cost Evaluation}
+
+为了探究Performance-Driven Workstealing Policy的轻量化设计是否对性能有明显的额外损耗,
+我们在仅使用一个节点下的一个worker(仅占用一个线程)的情况下对比不同Policy下的NS-hivert应用的运行时间.
+使用NS-hivert应用因为它的运行时间波动较小,造成的干扰较小,
+为了缩短运行时间方便测量,
+我们将其参数g改为$g = 37$(genus: Depth in the tree to count until).
+
+测试结果如\cref{fig:time_comparison_ns_one_worker},
+\begin{figure}[h]
+    \centering % 让图片居中显示
+    \includegraphics[width=0.98\textwidth]{images/time_comparison_ns_one_worker.pdf} % 插入图片，设置图片宽度为文本宽度的80%
+    \caption{time comparison for NS-hivert using one locality with one worker} % 提供图片的注解
+    \label{fig:time_comparison_ns_one_worker} % 为图片提供一个标签，以便在文档的其他地方引用
+\end{figure}
+\FloatBarrier
+
+可以看出由于Performance-Driven Workstealing Policy的轻量化设计,
+通过无锁化等机制减少了计算资源的额外损耗,
+在仅使用单个worker,
+无任务窃取发生的情况,也就是无法优化窃取目标的情况下,
+而且在Performance-Driven Workstealing Policy有后台任务动态刷新窃取目标的情况下,
+也能比原版YewPar的Workstealing Policy的应用达到2\%左右的速度提升,
+说明其设计是非常成功的,
+成功达到了轻量化的目的,
+减少了因为任务窃取框架带来的性能损耗.
 
 %%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%
 \chapter{Conclusion}\label{conclusion}

@@ -118,3 +118,12 @@ mpiexec.openmpi -n 5 --host gpgnode-01,gpgnode-02,gpgnode-03,gpgnode-04,gpgnode-
 mpiexec.openmpi -n 5 --host gpgnode-01,gpgnode-02,gpgnode-03,gpgnode-04,gpgnode-05 /cluster/gpg/YewPar/build/install/bin/NS-hivert --skeleton budget -b 1000000 -g 47 --hpx:threads 16
 [84444,82186,83962,84170,85396,81858,81957,85656,84645,84748]
 ==========
+
+
+==================================================================================================
+one thread run:
+
+/cluster/gpg/hao/YewPar/build/install/bin/NS-hivert --skeleton budget -b 1000000 -g 37 --hpx:threads 1
+[16386,16382,16384,16380,16374,16395,16383,16381,16363,16382]
+/cluster/gpg/YewPar/build/install/bin/NS-hivert --skeleton budget -b 1000000 -g 37 --hpx:threads 1
+[16715,16776,16738,16709,16753,16750,16755,16750,16740,16735]

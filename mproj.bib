@@ -247,3 +247,101 @@
   publisher = {INFORMS},
   doi       = {https://doi.org/10.1287/opre.42.6.1042}
 }
+
+@article{BLUMOFE199655,
+  title    = {Cilk: An Efficient Multithreaded Runtime System},
+  journal  = {Journal of Parallel and Distributed Computing},
+  volume   = {37},
+  number   = {1},
+  pages    = {55-69},
+  year     = {1996},
+  issn     = {0743-7315},
+  doi      = {https://doi.org/10.1006/jpdc.1996.0107},
+  url      = {https://www.sciencedirect.com/science/article/pii/S0743731596901070},
+  author   = {Robert D. Blumofe and Christopher F. Joerg and Bradley C. Kuszmaul and Charles E. Leiserson and Keith H. Randall and Yuli Zhou},
+  abstract = {Cilk (pronounced “silk”) is a C-based runtime system for multithreaded parallel programming. In this paper, we document the efficiency of the Cilk work-stealing scheduler, both empirically and analytically. We show that on real and synthetic applications, the “work” and “critical-path length” of a Cilk computation can be used to model performance accurately. Consequently, a Cilk programmer can focus on reducing the computation's work and critical-path length, insulated from load balancing and other runtime scheduling issues. We also prove that for the class of “fully strict” (well-structured) programs, the Cilk scheduler achieves space, time, and communication bounds all within a constant factor of optimal. The Cilk runtime system currently runs on the Connection Machine CM5 MPP, the Intel Paragon MPP, the Sun Sparcstation SMP, and the Cilk-NOW network of workstations. Applications written in Cilk include protein folding, graphic rendering, backtrack search, and the ★Socrates chess program, which won second prize in the 1995 ICCA World Computer Chess Championship.}
+}
+
+@inproceedings{lea2000forkjoin,
+  author    = {Doug Lea},
+  title     = {A Java fork/join framework},
+  booktitle = {ACM Conference on Java},
+  year      = {2000},
+  url       = {https://gee.cs.oswego.edu/dl/papers/fj.pdf}
+}
+
+@article{leijen2009design,
+  author  = {Daan Leijen and Wolfram Schulte and Sebastian Burckhardt},
+  title   = {The Design of a Task Parallel Library},
+  journal = {ACM SIGPLAN Notices},
+  volume  = {44},
+  number  = {10},
+  pages   = {227},
+  year    = {2009},
+  note    = {CiteSeerX 10.1.1.146.4197},
+  doi     = {10.1145/1639949.1640106}
+}
+
+@misc{tokio,
+  title        = {What is Tokio?},
+  author       = {tokio.rs contributors},
+  howpublished = {\url{https://tokio.rs/tokio/tutorial}},
+  note         = {Retrieved 2020-05-27}
+}
+
+@article{krill2021tokio,
+  author  = {Paul Krill},
+  title   = {Tokio Rust runtime reaches 1.0 status},
+  journal = {InfoWorld},
+  year    = {2021},
+  month   = {Jan},
+  day     = {08},
+  note    = {Retrieved 2021-12-26}
+}
+
+@article{1631937,
+  author  = {Lee, E.A.},
+  journal = {Computer},
+  title   = {The problem with threads},
+  year    = {2006},
+  volume  = {39},
+  number  = {5},
+  pages   = {33-42},
+  doi     = {10.1109/MC.2006.180}
+}
+
+@inproceedings{10.1145/248052.248106,
+  author    = {Michael, Maged M. and Scott, Michael L.},
+  title     = {Simple, Fast, and Practical Non-Blocking and Blocking Concurrent Queue Algorithms},
+  year      = {1996},
+  isbn      = {0897918002},
+  publisher = {Association for Computing Machinery},
+  address   = {New York, NY, USA},
+  url       = {https://doi.org/10.1145/248052.248106},
+  doi       = {10.1145/248052.248106},
+  booktitle = {Proceedings of the Fifteenth Annual ACM Symposium on Principles of Distributed Computing},
+  pages     = {267–275},
+  numpages  = {9},
+  keywords  = {concurrent queue, compare_and_swap, non-blocking, lock-free, multiprogramming},
+  location  = {Philadelphia, Pennsylvania, USA},
+  series    = {PODC '96}
+}
+
+@inproceedings{10.1145/564870.564881,
+  author    = {Michael, Maged M.},
+  title     = {High Performance Dynamic Lock-Free Hash Tables and List-Based Sets},
+  year      = {2002},
+  isbn      = {1581135297},
+  publisher = {Association for Computing Machinery},
+  address   = {New York, NY, USA},
+  url       = {https://doi.org/10.1145/564870.564881},
+  doi       = {10.1145/564870.564881},
+  abstract  = {Lock-free (non-blocking) shared data structures promise more robust performance and reliability than conventional lock-based implementations. However, all prior lock-free algorithms for sets and hash tables suffer from serious drawbacks that prevent or limit their use in practice. These drawbacks include size inflexibility, dependence on atomic primitives not supported on any current processor architecture, and dependence on highly-inefficient or blocking memory management techniques.Building on the results of prior researchers, this paper presents the first CAS-based lock-free list-based set algorithm that is compatible with all lock-free memory management methods. We use it as a building block of an algorithm for lock-free hash tables. In addition to being lock-free, the new algorithm is dynamic, linearizable, and space-efficient.Our experimental results show that the new algorithm outperforms the best known lock-free as well as lock-based hash table implementations by significant margins, and indicate that it is the algorithm of choice for implementing shared hash tables.},
+  booktitle = {Proceedings of the Fourteenth Annual ACM Symposium on Parallel Algorithms and Architectures},
+  pages     = {73–82},
+  numpages  = {10},
+  location  = {Winnipeg, Manitoba, Canada},
+  series    = {SPAA '02}
+}
+
+
