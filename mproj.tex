@@ -59,7 +59,8 @@
     % 我们的目标是通过设计一种新的workstealing策略来提高基于YewPar框架的应用的运行速度.
 
     % 为此我们设计并实现了一种新的基于各节点程序的多项性能参数来实时调整任务窃取的目标节点的Performance-Driven Workstealing Policy框架,
-    % 它的主要理念是通过尽量去窃取负载较高的节点的任务来达到接近负载均衡的状态,从而缩短最后完成任务的worker的时间,
+    % 它的主要理念是通过多种方式例如去窃取负载较高的节点的任务来达到接近负载均衡的状态等,
+    % 从而缩短最后完成任务的worker的时间,
     % 并且通过减少不必要的探测时间来缩短无任务worker的饥饿时间,
     % 最终缩短基于YewPar的应用在并行情况下的运行完成时间.
 
@@ -137,7 +138,7 @@ roommates and other friends, who encouraged me a lot during my project.
 
 而其中有名为YewPar\cite{10.1145/3332466.3374537}的框架,这是第一个用于精确组合搜索的可扩展并行框架。
 YewPar旨在允许非专业用户从并行中受益;
-重用编码为算法骨架的并行搜索模式(to reuse parallel search patterns encoded as algorithmic skeletons);
+重用编码为算法骨架的并行搜索模式(reuse parallel search patterns encoded as algorithmic skeletons);
 并能在多个并行架构上运行。
 
 与此同时,随着并行计算和多核处理器的普及,有效的任务调度变得越来越重要.
@@ -145,9 +146,9 @@ YewPar旨在允许非专业用户从并行中受益;
 而YewPar在本地任务池无任务时,是随机选取节点来窃取任务的,
 其中Workstealing是一种被广泛研究和应用的并行调度策略,
 它允许空闲的处理器从繁忙的处理器中“窃取”任务。
-然而,很多如YewPar这样的workstealing调度器往往采用偏随机窃取的策略,
+然而,很多如YewPar这样的内部Workstealing调度器往往采用偏随机窃取的策略,
 这往往会导致不必要的开销和延迟,浪费了大量试探窃取任务的时间,同时导致各节点的相对负载不均衡,延长了最终完成的时间。
-目前也有很多关于workstealing的改进,但是不能很好的兼顾到低开销,去中心化,高负载均衡,高性能,高可扩展性等特性.
+目前也有很多关于workstealing的改进,但是不能很好的兼顾到轻量化,去中心化,高性能,通用化等特性.
 
 我们的目标是通过改进YewPar的Workstealing策略来提高其性能,
 为此本文提出了新的Performance-Driven Workstealing Policy框架,
@@ -159,7 +160,7 @@ YewPar旨在允许非专业用户从并行中受益;
 能定期监测与传输多项有价值的数据,
 并计算缓存最优窃取目标节点,
 它能够通过自研的架构和数据处理算法以低成本搜集和分享多项性能指标,
-如各节点的任务执行时间、处理器的工作/空闲时间比例和任务池获取的耗时,
+如各节点的负载情况、各节点剩余任务数量和各节点的通讯延迟,
 并通过自研的Time-Optimized Workstealing Strategy算法计算出最优窃取目标节点并缓存和定时刷新,
 当有worker空闲时便能直接从缓存获取最近一段时间的最优窃取目标,
 从而能很好的在多节点去中心化的设计下以较低成本缩短完成全部任务所需的时间.
@@ -264,7 +265,7 @@ Java fork/join框架\cite{lea2000forkjoin}、
 
 还未有一种很好的通用化的低开销、轻量化、跨平台且高效的策略出现。
 Workstealing仍主要处于针对各种应用环境进行针对性优化的阶段。
-而文本的设计的任务窃取方案是基于各节点性能数据主要是采用基于worker,各节点剩余任务量和各节点通讯延迟的性能数据,
+而文本的设计的任务窃取方案是基于各节点性能数据主要是采用基于worker负载情况,各节点剩余任务量和各节点通讯延迟的性能数据,
 这些数据可以很轻松的在其它采用Workingstealing策略的框架中获取,
 所以具有很好的可移植性和通用性,
 可以更轻松地将这套方案移植到除了YewPar以外其它平台与框架上,
@@ -553,7 +554,7 @@ worker可以在任务执行前后更新其状态到Scheduler Channel模块(一�
 这时再递交给Performance Monitor,
 让它将本地workRate数据提交给local distributed component以方便其它节点进行快速查询.
 
-\subsection{各节点剩余任务量与获取花费时间收集}
+\subsection{各节点剩余任务量与通讯延迟时间收集}\label{collect_tesks_delay}
 
 性能数据还需要对各节点剩余任务量和获取花费时间进行收集,
 具体实现如\cref{fig:tasks_detection}所示.
@@ -567,39 +568,55 @@ worker可以在任务执行前后更新其状态到Scheduler Channel模块(一�
 \FloatBarrier
 
 在hpx分布式组件中包含了任务池与剩余任务数量,
-任务池有三种分布式操作包含添加任务,获取任务与窃取任务,
-所以在调用这三种操作时会进行检测并对剩余任务数进行更新.
+其中剩余任务数量是因为本文的框架需要而后期添加的,采用轻量的原子类型保障数据安全,
+原先任务池有三种分布式操作可以更改任务池:
+添加任务,获取任务与窃取任务.
+所以为了剩余任务数量数据的正确,
+在调用这三种操作时会对剩余任务数进行如\cref{fig:tasks_detection}所示地更新.
+在每个节点的Performance Monitor中,
+会定时遍历并调用各节点的distributed component的get\_task\_count接口以获取节点的剩余任务数.
 
-而在Performance Monitor中,
-会定时遍历并调用各节点的distributed component的接口获取节点的剩余任务数.
-同时在获取时通过计时器计算获取节点任务数的耗时,并加以处理后进行存储,
-存储会存储在一个长度为节点总数的数组的对应节点编号的位置的一个称为NodeInfo的数据结构中,
-也采用了无锁的原子数据以低成本保证线程安全.
+而为了统计本地节点与各节点的通讯延迟时间,
+也就是为了统计各节点的分布式组件间的数据获取所需时间,
+而之前获取各节点的剩余任务数时,
+正好是获取分布式组件的数据的操作,
+所以通过计算获取各节点的剩余任务数的耗时,
+也就在不额外占用通讯IO的同时统计出了本地节点与各节点的通讯延迟时间.
 
-这里耗时反应了节点线程池的繁忙程度和节点之间的通讯延迟时间,
-因为一方面任务数量是采用原子类型,在有数据修改时都会将其它修改或者读取请求延后,
-那么当任务池繁忙时,往往会导致获取任务数的耗时增加;
-另一方面由于各节点之间的通讯是通过hpx的分布式通讯机制进行的,
-当进行"get task count"分布式操作时,中间的耗时也必然反应了节点间的通讯延迟情况.
-后续通过这两项数据也会对最优窃取目标的计算有重要影响.
+补充一点,这里通讯延迟时间也稍微反应了节点线程池的繁忙程度,
+因为任务数量是采用原子类型,
+那么当任务池繁忙时,
+往往会因为小幅度阻塞其它修改操作导致获取任务数的耗时增加;
 
-由于获取任务数耗时是一项时间数据,可能具有较大的数值与波动,所以需要处理后再存储,
+由于获取的通讯延迟时间是一项时间数据,可能具有较大的数值与波动,所以需要处理后再存储,
 处理公式为
 \begin{align}
     \text{averageDelayTime}_i & = \ln\left(2.72 + \text{delayTime} \times \text{worker\_count}\right) \times 0.65 \notag               \\
                               & + \text{nodeInfoVector}[i]\texttt{->}\text{averageDelayTime} \times 0.35   \label{eq:averageDelayTime}
 \end{align}
-其中$i$为节点编号,$\text{delayTime}$为获取任务数的耗时,$\text{worker\_count}$为节点worker数量,
-公式首先通过将延迟时间乘以本地的worker数量来反应综合节点的通讯耗时,
-再同时参考\cref{eq:workrate}也通过对数函数与指数平滑来降低数据的敏感度,并使数据更加平滑和更具参考价值
+其中$i$为各节点编号,
+由于hpx框架下各节点的编号不变,
+所以可以作为数组的索引方便定位各节点,
+$\text{delayTime}$为通讯延迟时间,$\text{worker\_count}$为节点worker数量,
+公式首先通过将延迟时间乘以本地的worker数量来反应节点总体的通讯耗时,
+再同时参考\cref{eq:workrate}也通过对数函数与指数平滑来降低数据的敏感度,
+并保留了部分历史数据的影响,
+使数据更加平滑和更具参考价值.
+
+在处理后会将数据进行存储,
+存储的数据结构也采用了无锁化设计,
+如\cref{fig:tasks_detection}所示是一个长度为节点总数的数组,
+index编号对应各节点编号,
+数组中存储着一个称为NodeInfo的数据结构,
+其中包含着编号对应节点的原子类型的节点负载率,剩余任务数与平均通讯延迟时间,
 
 \section{最优窃取目标计算与缓存}
 
 在Performance Monitor通过性能收集机制获得了包括
-各节点负载情况,各节点剩余任务量,各节点获取任务池任务的耗时等性能数据后,
-Performance Monitor会通过各节点的数据计算出最优窃取目标节点,
-并将其缓存起来以供后续Performance Policy获取.
-其实现如\cref{fig:refresh_target}所示.
+各节点负载情况,各节点剩余任务量,各节点通讯延迟等性能数据后,
+Performance Monitor会通过这些数据计算出最优窃取目标节点,
+并将节点的id缓存起来以供后续Performance Policy获取.
+其整体流程如\cref{fig:refresh_target}所示.
 
 \begin{figure}[h]
     \centering % 让图片居中显示
@@ -609,9 +626,9 @@ Performance Monitor会通过各节点的数据计算出最优窃取目标节点,
 \end{figure}
 \FloatBarrier
 
-这里整体流程也采用了无锁化的设计,通过的互相独立的节点结构和原子数据以低时间成本保证线程安全.
+这里数组的数据结构在之前\cref{collect_tesks_delay}进行过介绍.
 
-其中首先通过遍历各节点的NodeInfo数据结构中性能数据,来计算各节点的steal-worthiness score,
+这套流程首先通过遍历各节点的NodeInfo数据结构中性能数据,来计算各节点的steal-worthiness score,
 得分越高则说明越值得窃取,
 其计算公式为
 \begin{align}
@@ -620,34 +637,56 @@ Performance Monitor会通过各节点的数据计算出最优窃取目标节点,
                    & \quad - \text{nodeInfoVector}[i]\texttt{->}\text{averageDelayTime} \label{eq:score}
 \end{align}
 
-公式的核心思想是尽量减少预计耗时最长的节点的任务池任务数的同时一定程度减少浪费在窃取其任务上的时间,
-所以先通过$\max\left(\text{nodeInfoVector}[i]\texttt{->}\text{workRateAverage}, 0.0001 \right)$
-来避免过小的无意义数据对计算的干扰,
-之后通过$\times \text{nodeInfoVector}[i]\texttt{->}\text{tasksCount}$来预估该节点执行完任务的大致剩余时间,
-最后通过$- \text{nodeInfoVector}[i]\texttt{->}\text{averageDelayTime}$
-来减去一定的获取任务预估的损耗时间.
-最终得到的结果越大则一定程度上说明该节点越值得窃取.
+公式的核心思想是尽量减少具有最大负载量的节点的任务同时,
+一定程度减少浪费在窃取任务上的时间.
+其分为以下几个部分:
+\begin{enumerate}
+    \item 通过$\max\left(\text{nodeInfoVector}[i]\texttt{->}\text{workRateAverage}, 0.0001 \right)$
+          来避免过小的无意义数据对计算的干扰.
+    \item 再通过$\times \text{nodeInfoVector}[i]\texttt{->}\text{tasksCount}$
+          也就是该节点的负载率与剩余任务数的乘积,
+          来预估该节点的总共负载量.
+    \item 最后通过$- \text{nodeInfoVector}[i]\texttt{->}\text{averageDelayTime}$
+          来减去一定的通讯延迟,
+          避免窃取任务时浪费过多时间.
+\end{enumerate}
+
+最终得到的结果越大则说明该节点越值得窃取,
+因为它的负载量较大,需要比其它节点更长的时间去处理剩余任务,
+同时它的通讯延迟也较小,窃取任务时浪费的时间也较少.
 
 在遍历完所有节点后,一般会得到一个最优的节点目标编号索引,
 会将这个最优的节点目标编号索引数进行缓存,
 当Performance Policy需要获取最优窃取目标的$id\_type$时,
 会通过提供的查询接口,
-通过索引再去节点数组里获取最优窃取目标节点的$id\_type$,
-这样同时也保障了在hpx的$id\_type$类型无原子操作的情况下仍能保持无锁机制.
+通过索引再去节点数组里获取最优窃取目标节点的$id\_type$.
+这样设计的一个原因是由于hpx的$id\_type$类型非基本数据类型,
+不能将其原子化,
+而其对应的数组索引编号数字是可以原子化的,
+为了保持整体的无锁化设计避免因长时间阻塞导致计算资源浪费,
+通过在刷新阶段只变更存储的索引数字,
+而在查询阶段只通过索引数字去读取对应的$id\_type$,
+这样所有的$id\_type$只会被读取而不会被修改,
+保障了无锁化下的数据安全.
 
-在判断最优窃取目标时,我们也需要判断窃取的成本是否高过了收益,
-而这种情况往往发生在窃取过程的消耗时间大于了帮助目标节点完成任务所节省的时间,
-这种情况下score往往会小于或者等于0,
-所以设置了额外的判断条件,在score小于或者等于0的情况下不会缓存最优窃取目标.
-
+在判断选出的最优窃取目标是否具有窃取价值,这主要从两个方面判断:
+\begin{itemize}
+    \item 窃取目标是否已无剩余任务可窃取.
+    \item 窃取的成本是否高过了收益,
+          即在窃取任务消耗的时间大于了帮助目标节点完成任务所节省的时间,
+\end{itemize}
+而这种情况下score往往会小于或者等于0,
+所以设置了额外的判断条件,在score小于或者等于0的情况下不会缓存最优窃取目标,
+此时worker在Performance Policy的策略下会再次尝试获取最优窃取目标,
+失败后进入短暂的休眠避免过于频繁的尝试导致计算资源的浪费.
 
 \section{Refresh data and provide tasks mechanism}
 
 在建立了一套从数据收集到计算最优窃取目标和缓存最优窃取目标的机制后,
-我们还需要的问题,就是以何种频率去刷新各项数据.
+我们还需要解决的问题,就是以何种频率去刷新各项数据.
 虽然每一次刷新数据的开销都是相对很小的,
 但是YewPar的worker数量会尽量占满本地的计算资源,
-那么当worker繁忙时,过于频繁的刷新会导致worker的计算资源被占用,
+那么当worker繁忙时,过于频繁的刷新会导致worker的工作被打断,
 从而一定程度影响YewPar的性能.
 但是如果刷新的频率过低,则会导致数据的可靠性降低,
 因为数据的实时性降低,
