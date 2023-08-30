@@ -152,7 +152,7 @@ Without compromising the search results, it can significantly reduce the executi
 In most scenarios, the improvements in its execution speed are quite pronounced.
 
 %%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%
-\chapter{Survey}\label{survey}
+\chapter{Background}\label{survey}
 
 \section{Modern Strategies in Distributed Concurrency}
 \subsection{Workstealing}
@@ -290,7 +290,7 @@ Parallel tree search can be categorized\cite{gendron1994parallel} as follows:
 \begin{figure}[h]
     \centering
     \includegraphics[width=0.98\textwidth]{images/yewpar_maxclique.pdf}
-    \caption{Maximum clique instance in YewPar. Input graph with clique \{a,d,f,g\} to the left and corresponding search tree to the right. Each tree node displays the current clique and a list of candidate vertices (in heuristic order) to extend that clique.\cite{10.1145/3332466.3374537}}
+    \caption{Maximum clique instance in YewPar. Input graph with clique \{a,d,f,g\} to the left and corresponding search tree to the right. Each tree node displays the current clique and a list of candidate vertices (in heuristic order) to extend that clique. Reproduced from \cite{10.1145/3332466.3374537}}
     \label{fig:yewpar_maxclique}
 \end{figure}
 \FloatBarrier
@@ -403,7 +403,7 @@ Initially, the YewPar's System Stack appears as illustrated in
 \begin{figure}[h]
     \centering
     \includegraphics[width=0.9\textwidth]{images/YewPar_System_Stack.jpg}
-    \caption{YewPar System Stack}
+    \caption{YewPar System Stack, Reproduced from \cite{10.1145/3332466.3374537}}
     \label{fig:yewpar_system_stack}
 \end{figure}
 
@@ -966,30 +966,7 @@ effectively reducing the performance losses introduced by the task-stealing fram
 
 %%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%
 
-\chapter{Conclusion}\label{conclusion}
-
-Our objective was to enhance the performance of YewPar by refining its Workstealing strategy.
-To this end, we devised and implemented a Performance-Driven Workstealing Policy,
-which optimizes the stealing targets during Workstealing based on performance data from each node.
-This involved the collection, processing, and transmission of performance data,
-as well as calculations and caching for the optimal stealing targets,
-complemented by a refreshing mechanism that offers two distinct methods.
-Through optimization tailored for multi-threading and inter-node communication,
-we achieved improvements in program execution speed at a minimal cost,
-while maintaining excellent compatibility.
-
-As per our evaluation results,
-the Performance-Driven Workstealing Policy framework is lightweight, incurring minimal overheads.
-Its optimization in the realm of Workstealing is remarkably evident.
-In scenarios free of computational resource occupation,
-the overall speed improvement of the program can surpass 8\%.
-Moreover, in situations where node resources are unevenly utilized and there's contention,
-speed enhancements can exceed 13\%.
-Considering that these improvements were achieved merely by optimizing YewPar's Workstealing Policy,
-and given that most of the program's runtime is spent processing tasks and generating new ones,
-it's evident that adjusting the stealing targets based on the performance data of each node is a highly effective approach.
-Therefore, the Performance-Driven Workstealing Policy stands out as an exceptional Workstealing strategy
-and can seamlessly replace YewPar's original Workstealing Policy.
+\chapter{Future Work \& Conclusion}\label{conclusion}
 
 \section{Future Work}
 
@@ -1020,6 +997,30 @@ thereby enhancing the performance of some of YewPar's skeletons.
 However, due to time constraints, we have not yet attempted to replace policies like the Priority Ordered Policy.
 As a result, not all skeletons in YewPar have benefited from the Performance-Driven Workstealing Policy.
 This presents an avenue for future exploration and work.
+
+\section{Conclusion}
+Our objective was to enhance the performance of YewPar by refining its Workstealing strategy.
+To this end, we devised and implemented a Performance-Driven Workstealing Policy,
+which optimizes the stealing targets during Workstealing based on performance data from each node.
+This involved the collection, processing, and transmission of performance data,
+as well as calculations and caching for the optimal stealing targets,
+complemented by a refreshing mechanism that offers two distinct methods.
+Through optimization tailored for multi-threading and inter-node communication,
+we achieved improvements in program execution speed at a minimal cost,
+while maintaining excellent compatibility.
+
+As per our evaluation results,
+the Performance-Driven Workstealing Policy framework is lightweight, incurring minimal overheads.
+Its optimization in the realm of Workstealing is remarkably evident.
+In scenarios free of computational resource occupation,
+the overall speed improvement of the program can surpass 8\%.
+Moreover, in situations where node resources are unevenly utilized and there's contention,
+speed enhancements can exceed 13\%.
+Considering that these improvements were achieved merely by optimizing YewPar's Workstealing Policy,
+and given that most of the program's runtime is spent processing tasks and generating new ones,
+it's evident that adjusting the stealing targets based on the performance data of each node is a highly effective approach.
+Therefore, the Performance-Driven Workstealing Policy stands out as an exceptional Workstealing strategy
+and can seamlessly replace YewPar's original Workstealing Policy.
 
 
 \appendix % first appendix
