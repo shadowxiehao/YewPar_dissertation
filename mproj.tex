@@ -119,7 +119,7 @@ Combinatorial problems are addressed by systematically exploring the search spac
 a process both theoretically and practically computationally challenging.
 Exact search, in particular, traverses the entire search space to offer a provably optimal solution.
 Conceptually, exact combinatorial search operates by generating and navigating through a (massive) tree representing potential solutions.
-Incorporating parallelism, on-the-fly tree generation, search heuristics, and pruning can diminish the execution time of exact search.
+Incorporating parallelism, on-the-fly tree generation, search heuristics, and pruning can diminish the execution time of an exact search.
 Due to the vast and highly irregular search trees, parallelizing exact combinatorial search poses significant challenges.
 
 A framework known as YewPar\cite{10.1145/3332466.3374537} stands out as the first scalable parallel framework tailored for precise combinatorial search.
@@ -131,11 +131,11 @@ Concurrently, with the proliferation of parallel computing and multi-core proces
 A key feature of YewPar is its capability to parallelize search, accomplished by allowing multiple workers in a node to steal tasks from other nodes' task pools when their local task pools run dry.
 In YewPar, when a local task pool is empty, it randomly selects nodes for task theft.
 Workstealing, a widely researched and implemented parallel scheduling strategy, permits idle processors to "steal" tasks from their busier counterparts.
-However, many internal workstealing schedulers, like YewPar, tend to adopt a somewhat random theft approach, often leading to unnecessary overhead, latency, and a vast amount of time spent in probing for tasks to steal.
+However, many internal Workstealing schedulers, like YewPar, tend to adopt a somewhat random theft approach, often leading to unnecessary overhead, latency, and a vast amount of time spent in probing for tasks to steal.
 This often results in relative load imbalances across nodes, prolonging the overall completion time.
-While numerous improvements on workstealing have emerged, many fail to adequately balance features such as lightweight design, decentralization, high performance, and generalizability.
+While numerous improvements on Workstealing have emerged, many fail to adequately balance features such as lightweight design, decentralization, high performance, and generalizability.
 
-Our objective is to enhance YewPar's performance by refining its workstealing strategy.
+Our objective is to enhance YewPar's performance by refining its Workstealing strategy.
 To this end, this paper introduces a new "Performance-Driven Workstealing Policy" framework.
 Its core philosophy centers on attempting to steal tasks from higher-load nodes to approximate a balanced load state, thereby reducing the time taken for the last worker to complete its task.
 Additionally, by minimizing unnecessary task probing and theft durations, the starvation time for task-less workers is reduced,
@@ -149,7 +149,7 @@ Through its in-house "Time-Optimized Workstealing Strategy" algorithm, it calcul
 Idle workers, if they fail to obtain tasks from the cached target, initiate an auxiliary refresh operation, assisting potential dormant refreshers in refreshing the optimal theft target cache.
 Collectively, these components enable the acceleration effects of the Performance-Driven Workstealing Policy.
 
-Furthermore, we evaluated the YewPar enhanced with the refined workstealing strategy.
+Furthermore, we evaluated the YewPar enhanced with the refined Workstealing strategy.
 Assessments were conducted on a Beowulf cluster equipped with multi-core machines.
 Results revealed that the improved YewPar, under varying node counts and workloads, outperforms the original YewPar in terms of performance.
 Without compromising the search results, it can significantly reduce the execution time of search applications based on YewPar.
@@ -266,7 +266,7 @@ To a certain extent, this ensures the framework's lightweight nature and high pe
 In computer science and artificial intelligence, combinatorial search refers to a method employed
 to find solutions within a designated search space.
 Classic combinatorial search challenges encompass problems like the Eight Queens puzzle and
-assessing actions in games with extensive game trees, such as Othello or chess.
+assessing actions in games with extensive game trees, such as Othello or Chess.
 This type of search is particularly apt for problems where the solution space is vast,
 making it infeasible to enumerate all possible solutions.
 Certain algorithms guarantee the discovery of the optimal solution,
@@ -302,7 +302,7 @@ Parallel tree search can be categorized\cite{gendron1994parallel} as follows:
 YewPar stands as a parallel framework explicitly designed for combinatorial search.
 It offers a suite of robust tools and strategies, allowing developers to effortlessly parallelize their search algorithms.
 YewPar's primary attributes are its flexibility and scalability,
-equipping it to handle a plethora of intricate search scenarios.
+equipping it to handle a wide range of intricate search scenarios.
 Within YewPar, work-stealing serves as the central strategy for task scheduling,
 enabling processors to steal tasks from others when their local task queues are empty.
 This ensures all processors remain occupied, thereby optimizing overall performance.
@@ -315,8 +315,8 @@ or a strongly constrained node in branch and bound optimization problems.
 To capitalize on these heuristics,
 searches proceed in a left-to-right order (across all tree depths).
 Therefore, a sequential search has complete information about the search tree,
-gleaning insights from all nodes on its left, and the search remains deterministic.
-Parallel search speculatively explores subtrees without the full left-side information and
+obtaining insights from all nodes on its left, and the search remains deterministic.
+Parallel search tentatively explores subtrees without the full left-side information and
 might benefit from a right-to-left information flow.
 However, this speculation implies that parallel searches might undertake more work
 than their sequential counterparts.
@@ -325,11 +325,11 @@ Detrimental anomalies occur when the runtime on \( w \) worker threads surpasses
 Here, the extra work might outweigh the benefits of added computational resources,
 or the additional computational resources might disrupt the search heuristics.
 Acceleration anomalies signify super-linear acceleration,
-often attributed to the right-to-left knowledge flow,
+often attributed to the information flow from right to left,
 which allows for more pruning than in sequential searches, thereby reducing the overall workload.
 The presence of anomalies complicates the parallel performance prediction for speculative search applications.
-Yew-Par aims to circumvent detrimental anomalies while permitting acceleration anomalies;
-\cite{ARCHIBALD201892} reports a specialized search framework that judiciously controls anomalies
+Yew-Par aims to avoid detrimental anomalies while permitting acceleration anomalies;
+\cite{ARCHIBALD201892} reports a specialized search framework that carefully controls anomalies
 to offer replicable performance guarantees.
 
 \subsection{The Rationale for Designing and Employing a Novel Workstealing Strategy in YewPar}
