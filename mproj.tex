@@ -180,7 +180,7 @@ among many other parallel frameworks and libraries.
 \end{figure}
 \FloatBarrier
 
-As illustrated in \cref{fig:workstealing},
+As illustrated in \ref{fig:workstealing},
 in the workstealing strategy, every processor within the system possesses its own queue of tasks awaiting execution.
 Each task consists of a series of instructions that need to be executed sequentially.
 During execution, a task might spawn new sub-tasks.
@@ -371,7 +371,7 @@ The Performance-Driven Workstealing Policy framework designed in this study enco
           the Performance Monitor when the local task pool is empty.
 \end{itemize}
 
-The relationship between these components is depicted in \cref{fig:overall_architecture}.
+The relationship between these components is depicted in \ref{fig:overall_architecture}.
 \begin{figure}[h]
     \centering
     \includegraphics[width=0.9\textwidth]{images/overall_architecture.pdf}
@@ -401,7 +401,7 @@ this paper meticulously designs and optimizes all three aspects.
 
 \subsection{Load Status of All Workers on a Node}
 Initially, the YewPar's System Stack appears as illustrated in
-\cref{fig:yewpar_system_stack}
+\ref{fig:yewpar_system_stack}
 \cite{10.1007/978-3-030-29400-7_14}.
 
 \begin{figure}[h]
@@ -416,7 +416,7 @@ either attempting to fetch tasks from the local pool or stealing tasks from the 
 The actual task execution is handled by various YewPar workers.
 Thus, to gauge the load status of each node without relying on underlying system functions,
 a straightforward and effective method is to assess the load status of workers on each node.
-This paper analyzes the workflow of workers under the YewPar framework, as shown in \cref{fig:period_of_worker}.
+This paper analyzes the workflow of workers under the YewPar framework, as shown in \ref{fig:period_of_worker}.
 
 \begin{figure}[h]
     \centering
@@ -452,7 +452,7 @@ This ensures that each cycle invariably undergoes the second phase,
 which is the task execution phase.
 
 Building upon this theoretical foundation,
-we have designed a comprehensive data collection scheme as depicted in \cref{fig:worker_collect_calculate}.
+we have designed a comprehensive data collection scheme as depicted in \ref{fig:worker_collect_calculate}.
 
 \begin{figure}[h]
     \centering
@@ -470,7 +470,7 @@ supplying the Performance Monitor with the requisite data for further calculatio
 
 The Scheduler Channel employs a specific data structure for data aggregation.
 To circumvent the overheads associated with lock usage,
-it adopts a lock-free design strategy as discussed in \cref{survey_lock}.
+it adopts a lock-free design strategy as discussed in \ref{survey_lock}.
 This design aims to mitigate contention among workers when collecting load data.
 
 This data structure principally consists of two arrays, each with a length equivalent to the number of local workers:
@@ -501,7 +501,7 @@ The load data collection here primarily consists of two workflows:
           it calculates the current workRate and switches its state to IDLE.
 \end{itemize}
 
-During the "set state to IDLE" phase, the algorithm to compute the latest workRate is presented in \cref{eq:workrate}:
+During the "set state to IDLE" phase, the algorithm to compute the latest workRate is presented in \ref{eq:workrate}:
 
 \begin{align}
     \text{workRate} & = \left( \ln\left( 2.72 + \frac{\text{workTime}}{\text{workTime} + \text{idleTime}} \right) \right. \notag   \\
@@ -545,7 +545,7 @@ The monitor submits this local workRate data to the local distributed component,
 \subsection{Collection of Residual Task Volume and Communication Latency}\label{collect_tesks_delay}
 
 Performance data also requires the collection of residual task volume and acquisition time for each node,
-as illustrated in \cref{fig:tasks_detection}.
+as illustrated in \ref{fig:tasks_detection}.
 
 \begin{figure}[h]
     \centering
@@ -561,7 +561,7 @@ employs a lightweight atomic type to ensure data integrity.
 Originally, the task pool had three distributed operations to modify it:
 adding tasks, retrieving tasks, and stealing tasks.
 To maintain the accuracy of the residual task count,
-updates are made during these operations as depicted in \cref{fig:tasks_detection}.
+updates are made during these operations as depicted in \ref{fig:tasks_detection}.
 Within each node's Performance Monitor,
 a routine will traverse and invoke the get\_task\_count interface of each node's distributed component to obtain the residual task count.
 
@@ -590,13 +590,13 @@ As node identifiers remain consistent within the HPX framework,
 they can serve as array indices for easy node location.
 $\text{delayTime}$ denotes the communication delay, and $\text{worker\_count}$ is the count of workers on the node.
 Firstly, the formula multiplies the delay time by the local worker count to reflect the node's overall communication overhead.
-Similar to \cref{eq:workrate}, logarithmic functions and exponential smoothing are applied to reduce data sensitivity,
+Similar to \ref{eq:workrate}, logarithmic functions and exponential smoothing are applied to reduce data sensitivity,
 retaining some impact from historical data,
 making the results smoother and more informative.
 
 After processing, the data is stored.
 The storage data structure also adopts a lock-free design,
-as shown in \cref{fig:tasks_detection}.
+as shown in \ref{fig:tasks_detection}.
 It's an array with a length equal to the total number of nodes,
 with index numbers corresponding to node identifiers.
 Stored within the array is a structure called NodeInfo,
@@ -608,7 +608,7 @@ Upon acquiring performance data such as node load status, residual task volume o
 and communication latency through the performance collection mechanism in the Performance Monitor,
 the optimal steal target node is calculated using these data.
 The node's ID is then cached for subsequent retrieval by the Performance Policy.
-The overall process is illustrated in \cref{fig:refresh_target}.
+The overall process is illustrated in \ref{fig:refresh_target}.
 
 \begin{figure}[h]
     \centering
@@ -618,7 +618,7 @@ The overall process is illustrated in \cref{fig:refresh_target}.
 \end{figure}
 \FloatBarrier
 
-The array data structure has been introduced earlier in \cref{collect_tesks_delay}.
+The array data structure has been introduced earlier in \ref{collect_tesks_delay}.
 
 The procedure starts by iterating through the NodeInfo data structure of each node to calculate the steal-worthiness score.
 A higher score indicates a higher worthiness for task stealing.
@@ -674,7 +674,7 @@ In the worst-case scenario, this might lead to stealing tasks from already starv
 
 To address this issue, this paper proposes a bidirectional dynamic refresh mechanism.
 This mechanism consists of two refresh methods: an automatic dynamic refresh method and an auxiliary refresh method facilitated by the Performance Policy.
-The general workflow is depicted in \cref{fig:refresh_provide}.
+The general workflow is depicted in \ref{fig:refresh_provide}.
 
 \begin{figure}[h]
     \centering
@@ -692,7 +692,7 @@ Conversely, if results align with expectations, indicating that most workers are
 the time until the next refresh will be gradually extended to minimize unnecessary interruptions.
 Currently, the optimality of the refresh is primarily judged by the score.
 If the score is less than or equal to zero, it is considered suboptimal.
-According to \cref{eq:score}, this is likely due to a scarcity of tasks in the pool or excessive time taken to obtain tasks.
+According to \ref{eq:score}, this is likely due to a scarcity of tasks in the pool or excessive time taken to obtain tasks.
 Under such conditions, the cost of task stealing might outweigh the benefits.
 
 It's worth noting that while dynamically adjusting the refresh time yields noticeable benefits in practice,
@@ -704,7 +704,7 @@ Furthermore, incorporating algorithms like exponential smoothing retains the inf
 ensuring that even slightly delayed data accurately reflects the overall status of nodes.
 
 However, there's still room for improvement and optimization in the aforementioned design.
-Thus, as shown on the right side of \cref{fig:refresh_provide}, an auxiliary refresh mechanism facilitated by the Performance Policy has been introduced.
+Thus, as shown on the right side of \ref{fig:refresh_provide}, an auxiliary refresh mechanism facilitated by the Performance Policy has been introduced.
 The essence of the Performance Policy is a task retrieval strategy.
 It prioritizes acquiring local tasks since doing so allows workers to quickly obtain and execute tasks, minimizing resource wastage.
 If local tasks are unavailable, the policy will first query the Performance Monitor's cached optimal steal target id.
@@ -754,6 +754,11 @@ For NS-hivert, the Budget skeleton was employed, being more suitable for the NS-
 Parameters were set as \(b = 10^6\) (backtrack-budget: Number of backtracks before spawning work) and \(g = 47\) (genus: Depth in the tree to count until) to ensure accurate results while increasing the workload to prolong runtime and thus reduce statistical errors.
 
 \section{Experimental Setup}
+
+The code used for the experiments,
+along with installation instructions and detailed experimental specifics (including the commands used and data obtained),
+can be found in the Appendix \ref{appendix:link}.
+
 We conducted measurements on the program's execution across as many as 20 machines.
 Each machine was equipped with a dual 8-core Intel Xeon E5-2640v2 2GHz CPU (without hyper-threading),
 64GB RAM, and was running the Ubuntu 22.04.2 LTS operating system.
@@ -783,7 +788,7 @@ During these tests, the running program had exclusive access to all computationa
 
 \subsection{Isolated Performance Evaluation of Maxclique}
 
-The results for the run time of the Maxclique program based on the Depth-Bounded skeleton, averaged over ten runs, are presented in \cref{fig:time_comparison_max_solo}.
+The results for the run time of the Maxclique program based on the Depth-Bounded skeleton, averaged over ten runs, are presented in \ref{fig:time_comparison_max_solo}.
 The results are divided into two sections: run-time evaluation and a comparison of the performance improvement of the Performance-Driven Workstealing Policy over the original DepthPool Workstealing Policy.
 
 The formula for calculating the speed improvement is given by
@@ -819,7 +824,7 @@ To understand this anomaly, we undertook an analysis:
           The Maxclique program based on the Depth-Bounded skeleton exhibited a higher probability of super-linear deceleration compared to other applications.
           To validate this hypothesis, beyond analyzing the YewPar code,
           we also studied the runtime fluctuations of the Maxclique program based on the Depth-Bounded skeleton.
-          Using the data from a 10-node test as an example, the fluctuations are depicted in \cref{fig:maxclique_16_fluctuations}.
+          Using the data from a 10-node test as an example, the fluctuations are depicted in \ref{fig:maxclique_16_fluctuations}.
           \begin{figure}[h]
               \centering
               \includegraphics[width=0.8\textwidth]{images/maxclique_16_fluctuations.pdf}
@@ -841,14 +846,14 @@ To understand this anomaly, we undertook an analysis:
           leading to an increase in extraneous tasks.
 
           Although the frequent changes in the Workstealing target might result in the generation of extra tasks,
-          it's worth noting in \cref{fig:time_comparison_max_solo} that between 15 and 20 nodes,
+          it's worth noting in \ref{fig:time_comparison_max_solo} that between 15 and 20 nodes,
           there's a relative speed increase.
           This can likely be attributed to the benefits of optimized Workstealing targets progressively outweighing the detriments caused by the additional tasks.
 \end{itemize}
 
 \subsection{Isolated Performance Evaluation of NS-hivert}
 
-For the NS-hivert program based on the Budget skeleton, the results after averaging the runtimes from ten iterations for each test set are depicted in \cref{fig:time_comparison_ns_solo}.
+For the NS-hivert program based on the Budget skeleton, the results after averaging the runtimes from ten iterations for each test set are depicted in \ref{fig:time_comparison_ns_solo}.
 The evaluation encompasses both runtime assessment and the speed improvement evaluation comparing the Performance-Driven Workstealing Policy to the original DepthPool Workstealing Policy.
 
 \begin{figure}[h]
@@ -866,7 +871,7 @@ Considering this enhancement is solely achieved by adjusting the Workstealing Po
 
 Contrasting with the Maxclique program, the speed improvements attributed to the Performance-Driven Workstealing Policy are more pronounced here as node counts increase.
 This is primarily because the NS-hivert program experiences fewer adverse effects from performance anomalies as discussed in \ref{sec:performance_anomalies}.
-We also analyzed the runtime variability of the NS-hivert program, as shown in \cref{fig:NS_hivert_fluctuations}.
+We also analyzed the runtime variability of the NS-hivert program, as shown in \ref{fig:NS_hivert_fluctuations}.
 
 \begin{figure}[h]
     \centering
@@ -876,7 +881,7 @@ We also analyzed the runtime variability of the NS-hivert program, as shown in \
 \end{figure}
 \FloatBarrier
 
-Utilizing \cref{eq:variability_percentage} to calculate the maximum variability percentage,
+Utilizing \ref{eq:variability_percentage} to calculate the maximum variability percentage,
 for the NS-hivert application based on the Performance-Driven Workstealing Policy,
 the maximum variability percentage was 0.57\%.
 For the application based on the DepthPool Workstealing Policy, it was 1.22\%.
@@ -902,7 +907,7 @@ Nevertheless, these evaluation results can still shed light on the performance d
 
 \subsection{Simultaneous Performance Evaluation of Maxclique}
 
-For the Maxclique program based on the Depth-Bounded skeleton, the results of the runtime tests under simultaneous execution conditions, averaged over ten runs, are illustrated in \cref{fig:time_comparison_max_simu}.
+For the Maxclique program based on the Depth-Bounded skeleton, the results of the runtime tests under simultaneous execution conditions, averaged over ten runs, are illustrated in \ref{fig:time_comparison_max_simu}.
 The evaluation is again bifurcated into two aspects: the runtime assessment and the comparison of the speed improvement between the Performance-Driven Workstealing Policy and the original DepthPool Workstealing Policy.
 
 \begin{figure}[h]
@@ -921,7 +926,7 @@ However, as the number of nodes continues to increase, the advantages of optimiz
 
 \subsection{Simultaneous Performance Evaluation of NS-hivert}
 
-For the NS-hivert program based on the Budget skeleton, the average results over ten runs for the runtime tests under simultaneous execution conditions are presented in \cref{fig:time_comparison_ns_simu}.
+For the NS-hivert program based on the Budget skeleton, the average results over ten runs for the runtime tests under simultaneous execution conditions are presented in \ref{fig:time_comparison_ns_simu}.
 The evaluation encompasses both the runtime assessment and the comparison of speed improvement between the Performance-Driven Workstealing Policy and the original DepthPool Workstealing Policy.
 
 \begin{figure}[h]
@@ -950,7 +955,7 @@ We opted for the NS-hivert application due to its minimal runtime fluctuations, 
 To expedite the runtime for ease of measurement,
 we adjusted its parameter \( g \) to \( g = 37 \) (genus: Depth in the tree to count until).
 
-The test results are displayed in \cref{fig:time_comparison_ns_one_worker}.
+The test results are displayed in \ref{fig:time_comparison_ns_one_worker}.
 \begin{figure}[h]
     \centering
     \includegraphics[width=0.9\textwidth]{images/time_comparison_ns_one_worker.pdf}
@@ -1029,9 +1034,9 @@ and can seamlessly replace YewPar's original Workstealing Policy.
 
 \appendix % first appendix
 %%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%
-\chapter{Appendix}
+\chapter{Appendix}\label{appendix:link}
 
-\section{Project description and Source code}
+\section{Project description and Source code}\label{appendix:note}
 
 The source code and other descriptions for this project can be found at :
 
@@ -1039,7 +1044,7 @@ The source code and other descriptions for this project can be found at :
 
 You can find specific instructions on the project such as installation instructions in the Readme file.
 
-\section{Evaluation Data}
+\section{Evaluation Data}\label{appendix:data}
 
 The following data is the commands for evaluation and the 10 results(running time, Displayed by arrays, unit: ms) of running corresponding commands.
 The commands should vary according to the actual environment.
