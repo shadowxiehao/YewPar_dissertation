@@ -410,6 +410,7 @@ Initially, the YewPar's System Stack appears as illustrated in
     \caption{YewPar System Stack, Reproduced from \cite{10.1145/3332466.3374537}}
     \label{fig:yewpar_system_stack}
 \end{figure}
+\FloatBarrier
 
 Within this, the Policy is responsible for being invoked by workers,
 either attempting to fetch tasks from the local pool or stealing tasks from the task pool of other nodes.
@@ -424,6 +425,7 @@ This paper analyzes the workflow of workers under the YewPar framework, as shown
     \caption{Period of the Worker}
     \label{fig:period_of_worker}
 \end{figure}
+\FloatBarrier
 
 It is evident that each worker, from creation to termination,
 exists within a loop comprising three possible stages:
@@ -460,6 +462,7 @@ we have designed a comprehensive data collection scheme as depicted in \ref{fig:
     \caption{Collect Worker State to Calculate the Workload}
     \label{fig:worker_collect_calculate}
 \end{figure}
+\FloatBarrier
 
 By inserting probing code at the beginning and end positions of task execution
 (which, upon execution, momentarily halts the current process and proceeds with probe-related operations),
@@ -755,10 +758,6 @@ Parameters were set as \(b = 10^6\) (backtrack-budget: Number of backtracks befo
 
 \section{Experimental Setup}
 
-The code used for the experiments,
-along with installation instructions and detailed experimental specifics (including the commands used and data obtained),
-can be found in the Appendix \ref{appendix:link}.
-
 We conducted measurements on the program's execution across as many as 20 machines.
 Each machine was equipped with a dual 8-core Intel Xeon E5-2640v2 2GHz CPU (without hyper-threading),
 64GB RAM, and was running the Ubuntu 22.04.2 LTS operating system.
@@ -773,6 +772,10 @@ manifesting as super-linear speed-ups/slowdowns.
 To control these factors,
 we ran each program multiple times under various node quantities (set to 10 times)
 and reported the aggregated statistical data.
+
+The code used for the experiments,
+along with installation instructions and detailed experimental specifics (including the commands used and data obtained),
+can be found in the Appendix \ref{appendix:link}.
 
 \section{Isolated Performance Evaluation of Different Policies}
 
@@ -831,12 +834,14 @@ To understand this anomaly, we undertook an analysis:
               \caption{Runtime fluctuations for maxclique-16 application based on two different policies using 10 localities.}
               \label{fig:maxclique_16_fluctuations}
           \end{figure}
+          \FloatBarrier
           When evaluating the runtime variability of the Maxclique-16 application,
           we calculated the percentage difference between the maximum and minimum values using the formula:
           \begin{equation}
               \text{Variability Percentage} = \left( \frac{\text{Max Value} - \text{Min Value}}{\text{Min Value}} \right) \times 100\%
               \label{eq:variability_percentage}
           \end{equation}
+          \FloatBarrier
           The Maxclique-16 application based on the Performance-Driven Workstealing Policy had a maximum variability percentage of 43.98\%.
           In contrast, the application based on the DepthPool Workstealing Policy had a maximum variability percentage of 23.61\%.
           It's clear that the Maxclique program's runtime based on the Depth-Bounded skeleton already exhibited significant variability,
