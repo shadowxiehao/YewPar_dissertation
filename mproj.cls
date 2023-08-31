@@ -101,10 +101,10 @@
     this declaration, but doing so would help future students.}
 
   \begin{tabular}{@{}llll}
-          &                           &            &                                                                               \\
-          &                           &            &                                                                               \\
-    Name: & \makebox[5cm][l]{Hao Xie} & Signature: & \makebox[5cm][l]{\includegraphics[width=4.0cm]{images/english_signature.jpg}} \\
-          &                           &            &                                                                               \\
-          &                           &            &                                                                               \\
+          &                           &            &                                                                                                           \\
+          &                           &            &                                                                                                           \\
+    Name: & \makebox[5cm][l]{Hao Xie} & Signature: & \makebox[5cm][l]{\raisebox{-0.5cm}{\includegraphics[width=4.0cm]{images/english_signature_removebg.png}}} \\
+          &                           &            &                                                                                                           \\
+          &                           &            &                                                                                                           \\
   \end{tabular}
 }
